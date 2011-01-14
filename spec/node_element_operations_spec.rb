@@ -1,7 +1,7 @@
 #require helper for cleaner require statements
 require File.join(File.expand_path(File.dirname(__FILE__)), '/../lib/helpers/require_helper')
 
-require Bufs.midas 'node_element_operations'
+require Tinkit.midas 'node_element_operations'
 
 module NodeElementOperationsSpecHelpers
   def execute_operations(neo_obj, operand_values={}, initial_field_values={}, op_names=:all)

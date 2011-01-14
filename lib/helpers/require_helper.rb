@@ -1,5 +1,5 @@
 #Tinkit Library Locations
-module Bufs
+module Tinkit
   @@top = File.join(File.dirname(__FILE__), '../..')  #main bufs directory
   @@lib = File.join(@@top, 'lib/')
   @@helpers = File.join(@@top, 'lib/helpers/')

@@ -1,7 +1,7 @@
 #require helper for cleaner require statements
 require File.join(File.dirname(__FILE__), '../helpers/require_helper')
 
-require Bufs.helpers 'log_helper'
+require Tinkit.helpers 'log_helper'
 
 
 #TODO This should be a class and instance assigned to a node class
@@ -187,7 +187,7 @@ end
 class NodeElementOperations
   include DataModelViews
   #Set Logger
-  @@log = BufsLog.set(self.name, :warn) 
+  @@log = TinkitLog.set(self.name, :warn) 
   
   DefaultFieldOpSet = {:id => :static_ops,
                                 :data => :replace_ops,

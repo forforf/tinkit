@@ -1,5 +1,5 @@
 module DataStructureModels
-  module Bufs
+  module Tinkit
     #Required Keys on instantiation
     RequiredInstanceKeys = [:my_category]
     RequiredSaveKeys = [:my_category]  #duplicative?

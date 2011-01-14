@@ -3,8 +3,8 @@ require File.join(File.expand_path(File.dirname(__FILE__)), '../../lib/tinkit')
 
 require 'couchrest'
 
-require Bufs.fixtures 'bufs_fixtures'
-require Bufs.helpers 'tk_escape'
+require Tinkit.fixtures 'bufs_fixtures'
+require Tinkit.helpers 'tk_escape'
 
 doc_db_name = "http://127.0.0.1:5984/tk_escape_spec/"
 EscapeTestDB = CouchRest.database!(doc_db_name)
@@ -18,7 +18,7 @@ describe TkEscape do
 
   it "should escape and unescape properly to the database" do
     #set initial conditions
-    test_file_name = BufsFixtures.test_files['strange_characters_in_file_name']
+    test_file_name = TinkitFixtures.test_files['strange_characters_in_file_name']
     test_file_basename = File.basename(test_file_name)
     test_file_data = File.open(test_file_name) {|f| f.read}
     test_doc_params = {'_id' => 'test_doc'}

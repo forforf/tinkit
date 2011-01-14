@@ -1,6 +1,6 @@
 #require helper for cleaner require statements
 require File.join(File.expand_path(File.dirname(__FILE__)), '../../lib/helpers/require_helper')
-require Bufs.glue 'sdb_s3/sdb_s3_files_mgr'
+require Tinkit.glue 'sdb_s3/sdb_s3_files_mgr'
 
 include SdbS3Interface
 GlueEnvMock = Struct.new(:user_datastore_location)

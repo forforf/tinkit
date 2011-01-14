@@ -34,5 +34,5 @@ require 'helpers/require_helper'
 
 #require File.join(File.expand_path(File.dirname(__FILE__)), 'helpers/require_helper')
 
-require Bufs.lib 'tinkit_node_factory'
+require Tinkit.lib 'tinkit_node_factory'
 

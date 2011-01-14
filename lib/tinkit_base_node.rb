@@ -2,11 +2,11 @@
 require File.join(File.dirname(__FILE__), '/helpers/require_helper')
 
 #bufs libraries
-require Bufs.midas 'node_element_operations'
-require Bufs.helpers 'hash_helpers'
-require Bufs.helpers 'camel'
-require Bufs.helpers 'tk_escape'
-require Bufs.helpers 'log_helper'
+require Tinkit.midas 'node_element_operations'
+require Tinkit.helpers 'hash_helpers'
+require Tinkit.helpers 'camel'
+require Tinkit.helpers 'tk_escape'
+require Tinkit.helpers 'log_helper'
 
 
 
@@ -149,10 +149,10 @@ class FilesMgr
 end
 
 
-class BufsBaseNode
+class TinkitBaseNode
 #this_file = File.basename(__FILE__)
 #Set Logger
-@@log = BufsLog.set("BufsBaseNode", :warn)
+@@log = TinkitLog.set("TinkitBaseNode", :warn)
 
 #TODO Figure out a way to distinguish method calls from dynamically set data
 # that were assigned as instance variables
@@ -197,8 +197,8 @@ class BufsBaseNode
     #moab_file_name = "moab_#{model_name}_env"
     
     #dynamic require (maybe just keep this static?)
-    require Bufs.glue glue_file_name
-    #require Bufs.moabs moab_file_name
+    require Tinkit.glue glue_file_name
+    #require Tinkit.moabs moab_file_name
     
     glue_lc_name = "#{model_name}_env"
     glue_const_name = Camel.ize(glue_lc_name)
@@ -600,7 +600,7 @@ class BufsBaseNode
   
   def raise_method_missing(meth_sym, *args)
     raise NoMethodError, <<-ERRORINFO
-        base class: BufsBaseNode
+        base class: TinkitBaseNode
         actual class: #{self.class}
         method: #{meth_sym.inspect}
         args: #{args.inspect}

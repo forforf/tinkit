@@ -1,13 +1,13 @@
 require 'time'
 require 'json'
 
-#Bufs directory organization defined in lib/helpers/require_helper
-require Bufs.helpers 'mime_types_new'
-require Bufs.helpers 'log_helper'
-require Bufs.helpers 'tk_escape'  #TODO: move to helpers
+#Tinkit directory organization defined in lib/helpers/require_helper
+require Tinkit.helpers 'mime_types_new'
+require Tinkit.helpers 'log_helper'
+require Tinkit.helpers 'tk_escape'  #TODO: move to helpers
 
 #TODO: Move this into a MonkeyPatch named module (called by file glue)
-# Bufs.monkey_patch punching_dir  or something
+# Tinkit.monkey_patch punching_dir  or something
 class Dir  #monkey patch  (duck punching?)
   def self.working_entries(dir=Dir.pwd)
     ignore_list = ['thumbs.db','all_child_files']
@@ -34,7 +34,7 @@ end
 module FilesystemInterface
   class FilesMgr
     #Set Logger
-    @@log = BufsLog.set(self.name)
+    @@log = TinkitLog.set(self.name)
 
     attr_accessor :attachment_location, :attachment_packages
 

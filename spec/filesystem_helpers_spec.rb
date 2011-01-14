@@ -1,7 +1,7 @@
 #require helper for cleaner require statements
 require File.join(File.dirname(__FILE__), '../lib/helpers/require_helper')
 
-require Bufs.helpers 'filesystem_helpers'
+require Tinkit.helpers 'filesystem_helpers'
 
 require 'fileutils'
 

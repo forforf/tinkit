@@ -1,6 +1,6 @@
 #require helper for cleaner require statements
 require File.join(File.expand_path(File.dirname(__FILE__)), '../lib/helpers/require_helper')
-require Bufs.glue 'filesystem/filesystem_files_mgr'
+require Tinkit.glue 'filesystem/filesystem_files_mgr'
 
 include FilesystemInterface
 GlueEnvMock = Struct.new(:model_key, :user_datastore_location)

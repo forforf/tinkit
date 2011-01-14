@@ -1,8 +1,8 @@
-#Bufs directory structure defined in lib/helpers/require_helpers'
-require Bufs.midas 'bufs_data_structure'
-require Bufs.glue '/sdb_s3/sdb_s3_files_mgr'
-require Bufs.helpers 'hash_helpers'
-require Bufs.helpers 'log_helper'
+#Tinkit directory structure defined in lib/helpers/require_helpers'
+require Tinkit.midas 'bufs_data_structure'
+require Tinkit.glue '/sdb_s3/sdb_s3_files_mgr'
+require Tinkit.helpers 'hash_helpers'
+require Tinkit.helpers 'log_helper'
 
 #require 'right_aws'
 require 'aws_sdb'  #published as forforf-aws-sdb
@@ -13,7 +13,7 @@ module SdbS3Env
 class GlueEnv
   
   
-  @@log = BufsLog.set(self.name, :warn)
+  @@log = TinkitLog.set(self.name, :warn)
    #used to identify metadata for models (should be consistent across models)
   #PersistLayerKey not needed, node key can be used as persistent layer key
   #see mysql_glue_env to decouple persistent layer key from node key
@@ -57,9 +57,9 @@ attr_accessor :user_id,
     key_fields = data_model_bindings[:key_fields] 
     initial_views_data = data_model_bindings[:views]
     
-    @required_instance_keys = key_fields[:required_keys] #DataStructureModels::Bufs::RequiredInstanceKeys
-    @required_save_keys = key_fields[:required_keys] #DataStructureModels::Bufs::RequiredSaveKeys
-    @node_key = key_fields[:primary_key] #DataStructureModels::Bufs::NodeKey
+    @required_instance_keys = key_fields[:required_keys] #DataStructureModels::Tinkit::RequiredInstanceKeys
+    @required_save_keys = key_fields[:required_keys] #DataStructureModels::Tinkit::RequiredSaveKeys
+    @node_key = key_fields[:primary_key] #DataStructureModels::Tinkit::NodeKey
     @persist_layer_key = @node_key
     #@moab_datastore_name = MoabDatastoreName
     @version_key = VersionKey  
@@ -68,7 +68,7 @@ attr_accessor :user_id,
     @metadata_keys = [@version_key, @namespace_key] 
     aak = ENV["AMAZON_ACCESS_KEY_ID"]
     asak = ENV["AMAZON_SECRET_ACCESS_KEY"]
-    #rightaws_log = BufsLog.set("RightAWS::SDBInterface", :warn)
+    #rightaws_log = TinkitLog.set("RightAWS::SDBInterface", :warn)
     #sdb = RightAws::SdbInterface.new(aak, asak, :logger => rightaws_log, :multi_thread => true)    
     sdb = AwsSdb::Service.new  #aws-sdb
     @user_datastore_location = use_domain!(sdb, "#{domain_base_name}__#{@user_id}") 

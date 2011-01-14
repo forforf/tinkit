@@ -1,8 +1,8 @@
-#Bufs directory structure defined in lib/helpers/require_helpers
-require Bufs.midas 'bufs_data_structure'
-require Bufs.glue '/couchrest/couchrest_files_mgr'
-require Bufs.helpers 'log_helper'
-require Bufs.helpers 'hash_helpers'
+#Tinkit directory structure defined in lib/helpers/require_helpers
+require Tinkit.midas 'bufs_data_structure'
+require Tinkit.glue '/couchrest/couchrest_files_mgr'
+require Tinkit.helpers 'log_helper'
+require Tinkit.helpers 'hash_helpers'
 
 module CouchRestViews
   #FIXME MAJOR BUG
@@ -10,7 +10,7 @@ module CouchRestViews
   #not a module, otherwise, last one set gets all the goodies
   
   #Set Logger
-  @@log = BufsLog.set(self.name, :warn)
+  @@log = TinkitLog.set(self.name, :warn)
   
   #Constants (pulling out magic text embedded in program)
   #Changing these will break compatibility with earlier records
@@ -153,7 +153,7 @@ module CouchrestEnv
 
 class GlueEnv
   #Set Logger
-  @@log = BufsLog.set(self.name, :warn)
+  @@log = TinkitLog.set(self.name, :warn)
 
   include CouchRest::Mixins::Views::ClassMethods
   include CouchrestViews
@@ -230,7 +230,7 @@ class GlueEnv
     @define_query_all = QueryAllStr #CouchRestEnv.query_for_all_collection_records
     
     @required_instance_keys = key_fields[:required_keys] #DataStructureModels::RequiredInstanceKeys
-    @required_save_keys = key_fields[:required_keys] #DataStructureModels::Bufs::RequiredSaveKeys
+    @required_save_keys = key_fields[:required_keys] #DataStructureModels::Tinkit::RequiredSaveKeys
     @model_key = @node_key #ModelKey #CouchRestEnv::ModelKey
     @version_key = VersionKey #CouchRestEnv::VersionKey
     @namespace_key = @model_name #NamespaceKey #CouchRestEnv::NamespaceKey

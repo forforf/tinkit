@@ -1,7 +1,7 @@
 require 'dbi'
 require 'json'
 
-require Bufs.helpers 'mime_types_new'
+require Tinkit.helpers 'mime_types_new'
 
 module MysqlInterface
   class FilesMgr

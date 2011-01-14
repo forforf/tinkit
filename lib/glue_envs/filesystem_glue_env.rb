@@ -1,14 +1,14 @@
-#Bufs directory organization defined in lib/helpers/require_helper.rb
-require Bufs.midas 'bufs_data_structure'
-require Bufs.glue 'filesystem/filesystem_files_mgr'
-require Bufs.helpers 'hash_helpers'
+#Tinkit directory organization defined in lib/helpers/require_helper.rb
+require Tinkit.midas 'bufs_data_structure'
+require Tinkit.glue 'filesystem/filesystem_files_mgr'
+require Tinkit.helpers 'hash_helpers'
 
 #class ViewsMgr
-module BufsFileSystemViews
+module TinkitFileSystemViews
   #Set Logger
-  @@log = BufsLog.set(self.name, :warn)
+  @@log = TinkitLog.set(self.name, :warn)
 
-  #Dependency on BufsInfoDocEnvMethods
+  #Dependency on TinkitInfoDocEnvMethods
   attr_accessor :model_actor
 
 
@@ -129,7 +129,7 @@ class GlueEnv
   #outside world that maps to the specific implementations of the
   #underlying persistent layers
   #Set Logger
-  @@log = BufsLog.set(self.name, :warn)
+  @@log = TinkitLog.set(self.name, :warn)
   
   include FilesystemViews
   
@@ -178,9 +178,9 @@ attr_accessor :user_id,
     key_fields = data_model_bindings[:key_fields] 
     initial_views_data = data_model_bindings[:views]
     
-    @required_instance_keys = key_fields[:required_keys] #DataStructureModels::Bufs::RequiredInstanceKeys
-    @required_save_keys = key_fields[:required_keys] #DataStructureModels::Bufs::RequiredSaveKeys
-    @node_key = key_fields[:primary_key] #DataStructureModels::Bufs::NodeKey
+    @required_instance_keys = key_fields[:required_keys] #DataStructureModels::Tinkit::RequiredInstanceKeys
+    @required_save_keys = key_fields[:required_keys] #DataStructureModels::Tinkit::RequiredSaveKeys
+    @node_key = key_fields[:primary_key] #DataStructureModels::Tinkit::NodeKey
   
 
     @moab_datastore_name = MoabDatastoreName
@@ -199,7 +199,7 @@ attr_accessor :user_id,
     
     @model_save_params = {:nodes_save_path => @user_datastore_location, :data_file => @moab_datastore_name, :node_key => @node_key}
     @_files_mgr_class = FilesystemInterface::FilesMgr
-    @views = BufsFileSystemViews
+    @views = TinkitFileSystemViews
     @moab_data = {:moab_datastore_name => @moab_datastore_name}
     #@views_mgr = ViewsMgr.new({:data_file => @data_file_name})
     

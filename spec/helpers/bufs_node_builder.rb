@@ -1,4 +1,4 @@
-module BufsNodeBuilder
+module TinkitNodeBuilder
   DefaultDocParams = {:my_category => 'default',
                       :parent_categories => ['default_parent'],
                       :description => 'default description'}
@@ -12,6 +12,6 @@ module BufsNodeBuilder
     #                  :parent_categories => ['default_parent'],
     #	      :description => 'default description'}
     init_params = get_default_params.merge(override_defaults)
-    return BufsBaseNode.new(init_params)
+    return TinkitBaseNode.new(init_params)
   end
 end

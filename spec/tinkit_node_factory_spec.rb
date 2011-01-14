@@ -1,14 +1,14 @@
 #require helper for cleaner require statements
 require File.join(File.expand_path(File.dirname(__FILE__)), '../lib/helpers/require_helper')
 
-require Bufs.spec_helpers 'bufs_test_environments'
+require Tinkit.spec_helpers 'bufs_test_environments'
 
 #Test Environments
 #The test environments sets up the following:
 # 4 seperate persistent layers
 # - 2 CouchDB databases using CouchRest 
 # - 2 File Systems (just different directories)  using File and FileUtils
-# A data structure called Bufs
+# A data structure called Tinkit
 # 2 "Glue" enviroments that bind the persistent layers to the data structure
 # The 4 low level persistent layers  are mapped to a common model framework
 # using the glue environments to bind the datastructure and persistent layers 
@@ -27,11 +27,11 @@ module MakeUserClasses
     @user4_id = "FileSysUser004"
     @user5_id = "SDBS3User005"
     @user6_id = "MysqlUser006"
-    node_class_id1 = "BufsInfoNode#{@user1_id}"
-    node_class_id2 = "BufsInfoNode#{@user2_id}"
-    node_class_id3 = "BufsFile#{@user3_id}"
-    node_class_id4 = "BufsFile#{@user4_id}"
-    node_class_id5 = "BufsSdbS3#{@user5_id}"
+    node_class_id1 = "TinkitInfoNode#{@user1_id}"
+    node_class_id2 = "TinkitInfoNode#{@user2_id}"
+    node_class_id3 = "TinkitFile#{@user3_id}"
+    node_class_id4 = "TinkitFile#{@user4_id}"
+    node_class_id5 = "TinkitSdbS3#{@user5_id}"
     node_class_id6 = "MysqlUser006#{@user6_id}"
     node_env1 = NodeHelper.env_builder("couchrest", node_class_id1, @user1_id, CouchDB.uri, CouchDB.host)
     node_env2 = NodeHelper.env_builder("couchrest", node_class_id2, @user2_id, CouchDB.uri, CouchDB.host)
@@ -42,18 +42,18 @@ module MakeUserClasses
     #node_env2 = CouchRestNodeHelpers.env_builder(node_class_id2, CouchDB2, @user2_id)
     #node_env3 = FileSystemNodeHelpers.env_builder(node_class_id3, FileSystem1, @user3_id)
     #node_env4 = FileSystemNodeHelpers.env_builder(node_class_id4, FileSystem2, @user4_id)
-    User1Class =  BufsNodeFactory.make(node_env1)
-    User2Class =  BufsNodeFactory.make(node_env2)
-    User3Class =  BufsNodeFactory.make(node_env3)
-    User4Class =  BufsNodeFactory.make(node_env4)
-    User5Class =  BufsNodeFactory.make(node_env5)
-    User6Class =  BufsNodeFactory.make(node_env6)
+    User1Class =  TinkitNodeFactory.make(node_env1)
+    User2Class =  TinkitNodeFactory.make(node_env2)
+    User3Class =  TinkitNodeFactory.make(node_env3)
+    User4Class =  TinkitNodeFactory.make(node_env4)
+    User5Class =  TinkitNodeFactory.make(node_env5)
+    User6Class =  TinkitNodeFactory.make(node_env6)
     
      #User5Class (AWS) is quirky and slow due to aws, add only when needed
     ClassesToTest = [User1Class, User2Class, User3Class, User4Class, User6Class]
 end
 
-describe BufsNodeFactory, "Making the Class" do
+describe TinkitNodeFactory, "Making the Class" do
   include MakeUserClasses
 
   before(:each) do
@@ -86,21 +86,21 @@ describe BufsNodeFactory, "Making the Class" do
 
     #users should be in different databases
     #raise @user_classes.inspect
-    couchrest_users = @user_classes.select{|u| u.to_s =~ /BufsInfoNode/}
+    couchrest_users = @user_classes.select{|u| u.to_s =~ /TinkitInfoNode/}
     couchrest_users.size.should == 2
     user0_db = couchrest_users[0].myGlueEnv.moab_data[:db]
     user1_db = couchrest_users[1].myGlueEnv.moab_data[:db]
     user0_db.should_not == user1_db
 
     #users should be in different directories
-    filesystem_users = @user_classes.select{|u| u.to_s =~ /BufsFile/}
+    filesystem_users = @user_classes.select{|u| u.to_s =~ /TinkitFile/}
     filesystem_users.size.should == 2
     user_dirs = filesystem_users.map{|f| f.myGlueEnv.user_datastore_location}
     user_dirs[0].should_not == user_dirs[1]
   end
 end
 
-describe BufsNodeFactory, "Basic Operations" do
+describe TinkitNodeFactory, "Basic Operations" do
   include MakeUserClasses
   include NodeHelpers
 
@@ -504,13 +504,13 @@ describe BufsNodeFactory, "Basic Operations" do
   #it should distinguish between user model data and the persistence layer data
 end
 
-describe BufsNodeFactory, "Document Operations with Attachments" do
+describe TinkitNodeFactory, "Document Operations with Attachments" do
   include MakeUserClasses
   include NodeHelpers
   #include UserNodeSpecHelpers
 
   before(:all) do
-    @test_files = BufsFixtures.test_files
+    @test_files = TinkitFixtures.test_files
   end
 
   before(:each) do
@@ -1006,7 +1006,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
 end
 
 #Note these tests use the default categories, rather than the buf categories
-describe BufsNodeFactory, "Portable Views" do
+describe TinkitNodeFactory, "Portable Views" do
   include MakeUserClasses
   include NodeHelpers
 
@@ -1071,7 +1071,7 @@ end
 describe "Cleanup" do
   include MakeUserClasses
     before(:all) do
-    @test_files = BufsFixtures.test_files
+    @test_files = TinkitFixtures.test_files
   end
 
   before(:each) do

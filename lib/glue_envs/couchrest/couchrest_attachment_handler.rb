@@ -1,9 +1,9 @@
 require 'cgi'
 require 'couchrest'
 
-#Bufs directory organization defined in lib/helpers/require_helper.rb
-require Bufs.helpers 'tk_escape'
-require Bufs.helpers 'mime_types_new'
+#Tinkit directory organization defined in lib/helpers/require_helper.rb
+require Tinkit.helpers 'tk_escape'
+require Tinkit.helpers 'mime_types_new'
 
 #Performs manipulations ont file attachment structures and metadata
 module CouchrestAttachmentHelpers
@@ -92,7 +92,7 @@ module CouchrestAttachmentHelpers
 end
 
 
-  #Converts from Bufs attachment format to closer to the metal
+  #Converts from Tinkit attachment format to closer to the metal
   #couchrest/CouchDB attachment format.  The reason this is needed is because
   #CouchDB cannot support custom metadata for attachments.  So custom metadata is held
   #in the CouchrestAttachment document.  This document will also hold the

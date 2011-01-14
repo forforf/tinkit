@@ -9,7 +9,7 @@ class TkEscape
     return esc_str
   end
 
-  #TODO: Continue using cgi or create unescape specific to Bufs?
+  #TODO: Continue using cgi or create unescape specific to Tinkit?
   def self.unescape(str)
     return CGI.unescape(str)
   end

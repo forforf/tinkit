@@ -13,20 +13,20 @@ module MakeUserClasses
     @user2_id = "SampleCouchUser002"
     @user3_id = "SampleFileSysUser003"
     @user4_id = "SampleFileSysUser004"
-    node_class_id1 = "BufsInfoNode#{@user1_id}"
-    node_class_id2 = "BufsInfoNode#{@user2_id}"
-    node_class_id3 = "BufsFile#{@user3_id}"
-    node_class_id4 = "BufsFile#{@user4_id}"
+    node_class_id1 = "TinkitInfoNode#{@user1_id}"
+    node_class_id2 = "TinkitInfoNode#{@user2_id}"
+    node_class_id3 = "TinkitFile#{@user3_id}"
+    node_class_id4 = "TinkitFile#{@user4_id}"
     couchpath = SampleCouchDB.uri
     couchhost = SampleCouchDB.host
     node_env1 = NodeHelper.env_builder("couchrest", node_class_id1, @user1_id, couchpath, couchhost)
     node_env2 = NodeHelper.env_builder("couchrest", node_class_id2, @user2_id, couchpath, couchhost)
     node_env3 = NodeHelper.env_builder("filesystem", node_class_id3, @user3_id, FileSystem)
     node_env4 = NodeHelper.env_builder("filesystem", node_class_id4, @user4_id, FileSystem)
-    User1Class =  BufsNodeFactory.make(node_env1)
-    User2Class =  BufsNodeFactory.make(node_env2)
-    User3Class =  BufsNodeFactory.make(node_env3)
-    User4Class =  BufsNodeFactory.make(node_env4)
+    User1Class =  TinkitNodeFactory.make(node_env1)
+    User2Class =  TinkitNodeFactory.make(node_env2)
+    User3Class =  TinkitNodeFactory.make(node_env3)
+    User4Class =  TinkitNodeFactory.make(node_env4)
 end
 
 
@@ -111,7 +111,7 @@ include SampleDataSets
 include NodeHelpers
 
   @user_classes = [User1Class, User2Class, User3Class, User4Class]
-  @test_files = BufsFixtures.test_files
+  @test_files = TinkitFixtures.test_files
   
   #stupid hack so I don't have to go change existing stuff
   class Dummy

@@ -1,7 +1,7 @@
 #require helper for cleaner require statements
 require File.join(File.expand_path(File.dirname(__FILE__)), '../lib/helpers/require_helper')
 
-require Bufs.glue 'couchrest_glue_env'
+require Tinkit.glue 'couchrest_glue_env'
 
 GlueTestDb = CouchRest.database!("http://127.0.0.1:5984/couchrest_glue_test")
 GlueTestDb.compact!

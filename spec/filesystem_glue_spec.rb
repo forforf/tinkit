@@ -1,7 +1,7 @@
 #require helper for cleaner require statements
 require File.join(File.expand_path(File.dirname(__FILE__)), '../lib/helpers/require_helper')
 
-require Bufs.glue 'filesystem_glue_env'
+require Tinkit.glue 'filesystem_glue_env'
 
 FilesystemGlueSpecDir = File.expand_path('../sandbox_for_specs/file_system_specs/glue_spec')
 

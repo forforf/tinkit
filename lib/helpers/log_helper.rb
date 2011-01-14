@@ -2,15 +2,15 @@ require 'log4r'
 
 #Set Logger
 #TODO: Create spec
-module BufsLog
+module TinkitLog
   include Log4r
 
   class << self; attr_accessor :default_level, :fatal_log, :log_output end
-  BufsLog.default_level = :info
-  BufsLog.log_output = 'stdout'
-  BufsLog.fatal_log = Logger.new('fatal_log')
-  BufsLog.fatal_log.level = FATAL
-  BufsLog.fatal_log.outputters = Outputter[BufsLog.log_output]
+  TinkitLog.default_level = :info
+  TinkitLog.log_output = 'stdout'
+  TinkitLog.fatal_log = Logger.new('fatal_log')
+  TinkitLog.fatal_log.level = FATAL
+  TinkitLog.fatal_log.outputters = Outputter[TinkitLog.log_output]
 
   @@log_levels = { :debug => DEBUG,
                    :info => INFO,
@@ -19,7 +19,7 @@ module BufsLog
                    :fatal => FATAL
                  }
 
-  def self.set(name, level=BufsLog.default_level, out=Outputter.stdout)
+  def self.set(name, level=TinkitLog.default_level, out=Outputter.stdout)
     log = Logger[name] || Logger.new(name)
     log.outputters = out
     log.level = @@log_levels[level]

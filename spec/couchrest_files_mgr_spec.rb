@@ -4,7 +4,7 @@ require File.join(File.expand_path(File.dirname(__FILE__)), '../lib/helpers/requ
 require 'spec'
 require 'couchrest'
 
-require Bufs.glue 'couchrest/couchrest_files_mgr'
+require Tinkit.glue 'couchrest/couchrest_files_mgr'
 
 include CouchrestInterface
 

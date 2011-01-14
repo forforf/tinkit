@@ -7,9 +7,9 @@ require DirFixEnvHelpers
 
 require 'couchrest'
 node_db_name = "http://bufs.younghawk.org:5984/bufs_test_spec/"
-CouchDB = BufsFixtures::CouchDB #CouchRest.database!(node_db_name)
+CouchDB = TinkitFixtures::CouchDB #CouchRest.database!(node_db_name)
 CouchDB.compact!
-CouchDB2 = BufsFixtures::CouchDB2
+CouchDB2 = TinkitFixtures::CouchDB2
 CouchDB2.compact!
 FileSystem1 = "/home/bufs/bufs/sandbox_for_specs/file_system_specs/group1"
 FileSystem2 = "/home/bufs/bufs/sandbox_for_specs/file_system_specs/group2"
@@ -17,10 +17,10 @@ FileSystem2 = "/home/bufs/bufs/sandbox_for_specs/file_system_specs/group2"
 require File.join(DirBaseEnvHelpers, 'lib/tinkit_node_factory')
 
 module UserNodeSpecHelpers
-  BufsNodeLibs = [File.join(DirBaseEnvHelpers,'lib/glue_envs/bufs_couchrest_glue_env')]
-  BufsNodeIncludes = [:CouchRestEnv]
-  BufsFileLibs = [File.join(DirBaseEnvHelpers, 'lib/glue_envs/bufs_filesystem_glue_env')]
-  BufsFileIncludes = [:FileSystemEnv]
+  TinkitNodeLibs = [File.join(DirBaseEnvHelpers,'lib/glue_envs/bufs_couchrest_glue_env')]
+  TinkitNodeIncludes = [:CouchRestEnv]
+  TinkitFileLibs = [File.join(DirBaseEnvHelpers, 'lib/glue_envs/bufs_filesystem_glue_env')]
+  TinkitFileIncludes = [:FileSystemEnv]
 end
 
 #TODO: Combine this and the next module

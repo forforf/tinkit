@@ -5,11 +5,11 @@ require File.join(helpers_path, 'require_helper')
 #This database has the necessary data for bootstrapping the fixture
 require 'couchrest'
 require 'fileutils'
-require Bufs.helpers 'mime_types_new'
-require Bufs.helpers 'log_helper'
+require Tinkit.helpers 'mime_types_new'
+require Tinkit.helpers 'log_helper'
 
 #Set Logger
-fix_log = BufsLog.set(File.basename(__FILE__))
+fix_log = TinkitLog.set(File.basename(__FILE__))
 #fix_log.level = DEBUG
 fix_log.debug {"Loading fixtures"} if fix_log.debug?
 fix_db_name = "http://127.0.0.1:5984/bufs_test_fixture_files/"
@@ -17,14 +17,14 @@ fix_log.debug {"Using DB: #{fix_db_name}"} if fix_log.debug?
 FixDB = CouchRest.database!(fix_db_name)
 FixDB.compact!
 
-BufsFixturesDir = File.dirname(__FILE__) + '/'
+TinkitFixturesDir = File.dirname(__FILE__) + '/'
 
-module BufsFixtures
+module TinkitFixtures
   class << self 
     attr_accessor :test_files
   end
-  ProjectLocation = BufsFixturesDir + '../'
-  TestFileLocation = BufsFixturesDir + 'test_files/'
+  ProjectLocation = TinkitFixturesDir + '../'
+  TestFileLocation = TinkitFixturesDir + 'test_files/'
 
   doc_db_name = "http://127.0.0.1:5984/bufs_test_spec/"
   CouchDB = CouchRest.database!(doc_db_name)
@@ -42,22 +42,22 @@ module BufsFixtures
   end
 end
 
-BufsFixtures.test_files = {}
+TinkitFixtures.test_files = {}
 FixDB.view('test_files/test_files')['rows'].each do |r|
  doc_id = r['value']['_id']
  att_name = r['value']['_attachments'].keys.first
 
  file_data = FixDB.fetch_attachment(FixDB.get(doc_id), att_name)
- file_name = BufsFixtures::TestFileLocation + att_name
+ file_name = TinkitFixtures::TestFileLocation + att_name
  File.open(file_name, 'wb'){|f| f.write(file_data)}
- BufsFixtures.test_files[doc_id] = file_name
+ TinkitFixtures.test_files[doc_id] = file_name
 end
 
 
 #puts "---------------------------------"
 #puts "- Test Filenames and References -"
 #puts "---------------------------------"
-#BufsFixtures.test_files.each do |doc, fname|
+#TinkitFixtures.test_files.each do |doc, fname|
   
 #  puts "#{doc.ljust(33)} ->  #{fname}"
 #end

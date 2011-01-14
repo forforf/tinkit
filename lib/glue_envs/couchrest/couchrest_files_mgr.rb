@@ -1,9 +1,9 @@
 #require helper for cleaner require statements
 #require File.join(File.dirname(__FILE__), '../../helpers/require_helper')
 
-#Bufs directory organization defined in lib/helpers/require_helper
-require Bufs.glue 'couchrest/couchrest_attachment_handler'
-require Bufs.helpers 'hash_helpers'
+#Tinkit directory organization defined in lib/helpers/require_helper
+require Tinkit.glue 'couchrest/couchrest_attachment_handler'
+require Tinkit.helpers 'hash_helpers'
 
 module CouchrestInterface
   class FilesMgr

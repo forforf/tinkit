@@ -1,18 +1,18 @@
 #require helper for cleaner require statements
 require File.join(File.dirname(__FILE__), '/helpers/require_helper')
 
-require Bufs.lib 'tinkit_base_node'
-require Bufs.helpers 'log_helper'
+require Tinkit.lib 'tinkit_base_node'
+require Tinkit.helpers 'log_helper'
 
-class BufsNodeFactory 
+class TinkitNodeFactory 
   #Set Logger
-  @@log = BufsLog.set(self.name, :debug)
+  @@log = TinkitLog.set(self.name, :debug)
 
   def self.make(node_env)
-    BufsLog.log_raise "No Node Environment provided" unless node_env
-    BufsLog.log_raise "Empty Node Environment provided" if node_env.empty?
-    BufsLog.log_raise "Malformed Node Environment" unless node_env.respond_to?(:keys)
-    BufsLog.log_raise "Malformed Node Environment" unless node_env.keys.include? :persist_model
+    TinkitLog.log_raise "No Node Environment provided" unless node_env
+    TinkitLog.log_raise "Empty Node Environment provided" if node_env.empty?
+    TinkitLog.log_raise "Malformed Node Environment" unless node_env.respond_to?(:keys)
+    TinkitLog.log_raise "Malformed Node Environment" unless node_env.keys.include? :persist_model
 
     
     neo_env = node_env[:data_model] || {}
@@ -29,14 +29,14 @@ class BufsNodeFactory
     #Security TODO: remove spaces and other 
 
     #---- Dynamic Class Definitions ----
-    dyn_user_class_def = "class #{user_doc_class_name} < BufsBaseNode
+    dyn_user_class_def = "class #{user_doc_class_name} < TinkitBaseNode
       
       class << self; attr_accessor :user_attachClass, end
 
       end"
 
-    BufsNodeFactory.class_eval(dyn_user_class_def)
-    docClass = BufsNodeFactory.const_get(user_doc_class_name)
+    TinkitNodeFactory.class_eval(dyn_user_class_def)
+    docClass = TinkitNodeFactory.const_get(user_doc_class_name)
 
     docClass.data_struc = neo
     

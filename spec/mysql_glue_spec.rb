@@ -1,7 +1,7 @@
 #require helper for cleaner require statements
 require File.join(File.expand_path(File.dirname(__FILE__)), '../lib/helpers/require_helper')
 
-require Bufs.glue 'mysql_glue_env'
+require Tinkit.glue 'mysql_glue_env'
 
 
 
