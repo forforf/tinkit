@@ -1,7 +1,7 @@
 #require helper for cleaner require statements
 require File.join(File.dirname(__FILE__), '/helpers/require_helper')
 
-require Bufs.lib 'bufs_base_node'
+require Bufs.lib 'tinkit_base_node'
 require Bufs.helpers 'log_helper'
 
 class BufsNodeFactory 

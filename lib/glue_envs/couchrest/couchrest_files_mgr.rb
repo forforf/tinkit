@@ -25,9 +25,9 @@ module CouchrestInterface
       def initialize(node_env, node_key_value)
         #for bufs node_key is the value of :my_category
         #although it is not used in this class, it is required to 
-        #maintain consitency with bufs_base_node
-        #TODO: Actually the goal is for moab's to have no dependency on bufs_base_node
-        #so maybe the glue environment should have a files interface to bufs_base_node??
+        #maintain consitency with tinkit_base_node
+        #TODO: Actually the goal is for moab's to have no dependency on tinkit_base_node
+        #so maybe the glue environment should have a files interface to tinkit_base_node??
         #@attachment_doc_class = node_env.attachClass  #old
         #TODO: just pass moab_data??
         @attachment_doc_class = node_env.moab_data[:attachClass]
