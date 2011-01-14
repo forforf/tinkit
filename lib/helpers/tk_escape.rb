@@ -1,6 +1,6 @@
 require 'cgi'  #Can replace with url_escape if performance is an issue
 
-class BufsEscape
+class TkEscape
   def self.escape(str)
     esc_str = str.gsub(/([^a-zA-Z0-9_.-]+)/n, '_')
     #str.gsub!('+', ' ')

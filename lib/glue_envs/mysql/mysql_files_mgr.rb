@@ -54,7 +54,7 @@ module MysqlInterface
         values_input = [node_name, basename, content_type, modified_at, File.open(filename, rb){|f| f.read}]
         sth.execute(*values_input)
       end
-      filenames.map {|f| BufsEscape.escape(File.basename(f))} #return basenames
+      filenames.map {|f| TkEscape.escape(File.basename(f))} #return basenames
     end
     
     def add_raw_data(node, attach_name, content_type, raw_data, file_modified_at = nil)

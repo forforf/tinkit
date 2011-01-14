@@ -309,8 +309,8 @@ end
     #check results
     test_attachment_id = test_doc_id + CouchrestAttachment::AttachmentID
     bia['_id'].should == test_attachment_id
-    bia['md_attachments'][BufsEscape.escape(test_file_basename)]['file_modified'].should == test_file_modified_time.to_s
-    bia['_attachments'][BufsEscape.escape(test_file_basename)]['content_type'].should == md_params['content_type']
+    bia['md_attachments'][TkEscape.escape(test_file_basename)]['file_modified'].should == test_file_modified_time.to_s
+    bia['_attachments'][TkEscape.escape(test_file_basename)]['content_type'].should == md_params['content_type']
  end
 
   it "should create multiple attachments in one update" do
@@ -338,10 +338,10 @@ end
     #verify results
     test_attachment_id = test_doc_id + CouchrestAttachment::AttachmentID
     bia['_id'].should == test_attachment_id
-    bia['md_attachments'][BufsEscape.escape(test_file1_basename)]['file_modified'].should == File.mtime(test_file1).to_s
-    bia['_attachments'][BufsEscape.escape(test_file1_basename)]['content_type'].should == md_params1['content_type']
-    bia['md_attachments'][BufsEscape.escape(test_file2_basename)]['file_modified'].should == File.mtime(test_file2).to_s
-    bia['_attachments'][BufsEscape.escape(test_file2_basename)]['content_type'].should == md_params2['content_type']
+    bia['md_attachments'][TkEscape.escape(test_file1_basename)]['file_modified'].should == File.mtime(test_file1).to_s
+    bia['_attachments'][TkEscape.escape(test_file1_basename)]['content_type'].should == md_params1['content_type']
+    bia['md_attachments'][TkEscape.escape(test_file2_basename)]['file_modified'].should == File.mtime(test_file2).to_s
+    bia['_attachments'][TkEscape.escape(test_file2_basename)]['content_type'].should == md_params2['content_type']
   end
 
   it "should add new files to an existing attachment doc" do
@@ -382,10 +382,10 @@ end
     bia_updated = bia_existing.class.update_attachment_package(bia_existing, attachs )
     #verify results
     #p test_file_basename
-    #p BufsEscape.escape(test_file_basename)
+    #p TkEscape.escape(test_file_basename)
     bia_updated['_id'].should == bia_existing['_id']
-    bia_updated['md_attachments'][BufsEscape.escape(test_file_basename)]['file_modified'].should == test_file_modified_time.to_s
-    bia_updated['_attachments'][BufsEscape.escape(test_file_basename)]['content_type'].should == md_params['content_type']
+    bia_updated['md_attachments'][TkEscape.escape(test_file_basename)]['file_modified'].should == test_file_modified_time.to_s
+    bia_updated['_attachments'][TkEscape.escape(test_file_basename)]['content_type'].should == md_params['content_type']
   end
 
   it "should replace older attachment data with new ones, but not vice versa" do
@@ -406,8 +406,8 @@ end
     bia = CouchrestAttachment.add_attachment_package(test_doc_id, CouchrestAttachment, attachs )
     #verify initial condition
     bia['_id'].should == test_attachment_id
-    bia['md_attachments'][BufsEscape.escape(test_file_basename)]['file_modified'].should == test_file_modified_time.to_s
-    bia['_attachments'][BufsEscape.escape(test_file_basename)]['content_type'].should == md_params['content_type']
+    bia['md_attachments'][TkEscape.escape(test_file_basename)]['file_modified'].should == test_file_modified_time.to_s
+    bia['_attachments'][TkEscape.escape(test_file_basename)]['content_type'].should == md_params['content_type']
     
     #set initial conditions for fresh and stale file
     stale_file = @test_files['stale_file']
@@ -432,10 +432,10 @@ end
     bia_updated = CouchrestAttachment.update_attachment_package(bia, attachs )
     #verify initial conditions
     bia_updated['_id'].should == test_attachment_id
-    bia_updated['md_attachments'][BufsEscape.escape(stale_basename)]['file_modified'].should == stale_modified_time.to_s
-    bia_updated['_attachments'][BufsEscape.escape(stale_basename)]['content_type'].should == md_params_stale['content_type']
-    bia_updated['md_attachments'][BufsEscape.escape(fresh_basename)]['file_modified'].should == fresh_modified_time.to_s
-    bia_updated['_attachments'][BufsEscape.escape(fresh_basename)]['content_type'].should == md_params_fresh['content_type']
+    bia_updated['md_attachments'][TkEscape.escape(stale_basename)]['file_modified'].should == stale_modified_time.to_s
+    bia_updated['_attachments'][TkEscape.escape(stale_basename)]['content_type'].should == md_params_stale['content_type']
+    bia_updated['md_attachments'][TkEscape.escape(fresh_basename)]['file_modified'].should == fresh_modified_time.to_s
+    bia_updated['_attachments'][TkEscape.escape(fresh_basename)]['content_type'].should == md_params_fresh['content_type']
     #if the above tests pass, then the files and database are synchronized
 
     sleep 1 #to put some time difference
@@ -445,7 +445,7 @@ end
     #puts "Unstale Mod Time (db is more recent): #{unstale_modified_time}"
     unstale_content_type = 'text/plain;unstale'
     unstale_params = {'file_modified' => unstale_modified_time, 'content_type' => unstale_content_type}
-    unstale_attach = { BufsEscape.escape(stale_basename) => {'data' => unstale_data, 'md'=> unstale_params } }
+    unstale_attach = { TkEscape.escape(stale_basename) => {'data' => unstale_data, 'md'=> unstale_params } }
 
     CouchrestAttachment.update_attachment_package(bia, unstale_attach)
     #database should now have more recent information for @stale_basename
@@ -468,8 +468,8 @@ end
     md_params_fresh2['file_modified'] = fresh_modified_time
     stale_data2 = File.open(stale_file, 'rb') {|f| f.read}
     fresh_data2 = File.open(fresh_file, 'rb') {|f| f.read}
-    attachs = {BufsEscape.escape(stale_basename) => {'data' => stale_data2, 'md' => md_params_stale2},
-      BufsEscape.escape(fresh_basename) => {'data' => fresh_data2, 'md' => md_params_fresh2}
+    attachs = {TkEscape.escape(stale_basename) => {'data' => stale_data2, 'md' => md_params_stale2},
+      TkEscape.escape(fresh_basename) => {'data' => fresh_data2, 'md' => md_params_fresh2}
     }
     #test
     new_bia = CouchrestAttachment.get(bia['_id'])
@@ -478,10 +478,10 @@ end
     #verify results
     #db should have fresh file, but not stale one (and maintain older db attachment)
     fresh_bia['_id'].should == test_attachment_id
-    fresh_bia['md_attachments'][BufsEscape.escape(stale_basename)]['file_modified'].should == unstale_modified_time
-    fresh_bia['_attachments'][BufsEscape.escape(stale_basename)]['content_type'].should == unstale_content_type
-    fresh_bia['md_attachments'][BufsEscape.escape(fresh_basename)]['file_modified'].should == fresh_modified_time
-    fresh_bia['_attachments'][BufsEscape.escape(fresh_basename)]['content_type'].should == fresh_content_type
+    fresh_bia['md_attachments'][TkEscape.escape(stale_basename)]['file_modified'].should == unstale_modified_time
+    fresh_bia['_attachments'][TkEscape.escape(stale_basename)]['content_type'].should == unstale_content_type
+    fresh_bia['md_attachments'][TkEscape.escape(fresh_basename)]['file_modified'].should == fresh_modified_time
+    fresh_bia['_attachments'][TkEscape.escape(fresh_basename)]['content_type'].should == fresh_content_type
   end
 
   it "should combine all attachment metadata when it is retrieved" do
@@ -510,8 +510,8 @@ end
     bia = CouchrestAttachment.add_attachment_package(test_doc_id, CouchrestAttachment, attachs )
     data = CouchrestAttachment.get_attachments(bia)
     #puts "SIA data: #{data.inspect}"
-    data[BufsEscape.escape(test_file1_basename)]['file_modified'].should == test_file1_modified_time.to_s
-    data[BufsEscape.escape(test_file1_basename)]['content_type'].should == MimeNew.for_ofc_x(test_file1)
+    data[TkEscape.escape(test_file1_basename)]['file_modified'].should == test_file1_modified_time.to_s
+    data[TkEscape.escape(test_file1_basename)]['content_type'].should == MimeNew.for_ofc_x(test_file1)
   end
 
   it "should delete attachments" do
@@ -544,7 +544,7 @@ end
     new_atts = bia.get_attachments
     #puts "Should be only 1: #{new_atts.keys.inspect}"
     new_atts.keys.size.should == 1
-    new_atts.keys.first.should == BufsEscape.escape(test_file2_basename)
+    new_atts.keys.first.should == TkEscape.escape(test_file2_basename)
 
   end
 end

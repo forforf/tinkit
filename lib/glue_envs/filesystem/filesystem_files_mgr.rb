@@ -44,7 +44,7 @@ module FilesystemInterface
       node_loc  = node._user_data[node.my_GlueEnv.node_key]
       node_path = File.join(root_path, node_loc)
       model_basenames = Dir.working_entries(node_path)
-      filenames = model_basenames.map{|b| File.join(node_path, BufsEscape.escape(b))}
+      filenames = model_basenames.map{|b| File.join(node_path, TkEscape.escape(b))}
     end
 
     def initialize(node_env, node_key)
@@ -62,7 +62,7 @@ module FilesystemInterface
         filenames << file_data[:src_filename]
       end
       filenames.each do |filename|
-        my_dest_basename = BufsEscape.escape(File.basename(filename))
+        my_dest_basename = TkEscape.escape(File.basename(filename))
         node_dir = @attachment_location
          #File.join(node.my_GlueEnv.user_datastore_selector, node.my_category)  #TODO: this should be node id, not my cat
         my_dest = File.join(node_dir, my_dest_basename)
@@ -76,7 +76,7 @@ module FilesystemInterface
         FileUtils.cp(filename, my_dest, :preserve => true, :verbose => false ) unless same_file
         #self.file_metadata = {filename => {'file_modified' => File.mtime(filename).to_s}}
       end
-      filenames.map {|f| BufsEscape.escape(File.basename(f))} #return basenames
+      filenames.map {|f| TkEscape.escape(File.basename(f))} #return basenames
     end
 
     def add_raw_data(node, attach_name, content_type, raw_data, file_modified_at = nil)
@@ -90,7 +90,7 @@ module FilesystemInterface
       end
       file_metadata['content_type'] = content_type #TODO: is unknown content handled gracefully?
       attachment_package = {}
-      esc_attach_name = BufsEscape.escape(attach_name)
+      esc_attach_name = TkEscape.escape(attach_name)
       node_path = @attachment_location
       FileUtils.mkdir_p(node_path) unless File.exist?(node_path)
       raw_data_filename = File.join(node_path, esc_attach_name)
@@ -118,7 +118,7 @@ module FilesystemInterface
       model_key = node.my_GlueEnv.model_key
     
       node_path = @attachment_location
-      filenames = file_basenames.map{|b| File.join(node_path, BufsEscape.escape(b))}
+      filenames = file_basenames.map{|b| File.join(node_path, TkEscape.escape(b))}
       FileUtils.rm_f(filenames)
     end
     #TODO: make private
@@ -165,7 +165,7 @@ module FilesystemInterface
         root_path = node.my_GlueEnv.user_datastore_location
         node_loc  = node._user_data[node.my_GlueEnv.node_key]
         node_path = File.join(root_path, node_loc)
-        filenames = model_basenames.map{|b| File.join(node_path, BufsEscape.escape(b))}
+        filenames = model_basenames.map{|b| File.join(node_path, TkEscape.escape(b))}
         #raise filenames.inspect
         FileUtils.rm_f(filenames)
         #subtract_all(node) if rem_atts.empty?

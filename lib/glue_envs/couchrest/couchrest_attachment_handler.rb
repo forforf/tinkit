@@ -28,7 +28,7 @@ module CouchrestAttachmentHelpers
     all_attach_data = {}
     attachments.each do |att_name, att_info|
       #att_info: 'data' => att data, 'md' => att metadata
-      esc_att_name = BufsEscape.escape(att_name)
+      esc_att_name = TkEscape.escape(att_name)
       att_params = {}
       obj_params = {}
       attach_data = nil
@@ -56,7 +56,7 @@ module CouchrestAttachmentHelpers
   def self.escape_names_in_attachments(unesc_attachments)
     escaped_attachments = {}
     unesc_attachments.each do |unesc_key, val|
-      esc_key = BufsEscape.escape(unesc_key)
+      esc_key = TkEscape.escape(unesc_key)
       escaped_attachments[esc_key] = val
     end
     return escaped_attachments
@@ -145,7 +145,7 @@ class CouchrestAttachment < CouchRest::ExtendedDocument
     att_doc.save
     
     sorted_attachments['att_md_by_name'].each do |att_name, params|
-      esc_att_name = BufsEscape.escape(att_name)
+      esc_att_name = TkEscape.escape(att_name)
       att_doc.put_attachment(esc_att_name, sorted_attachments['data_by_name'][esc_att_name],params)
     end
     
@@ -166,7 +166,7 @@ class CouchrestAttachment < CouchRest::ExtendedDocument
     most_recent_attachment = {}
     if existing_attachments
       new_attachments.each do |new_att_name, new_data|
-      esc_new_att_name = BufsEscape.escape(new_att_name)
+      esc_new_att_name = TkEscape.escape(new_att_name)
         working_doc = att_doc.class.get(att_doc['_id'])
         if existing_attachments.keys.include? esc_new_att_name
           #filename already exists as an attachment
@@ -230,7 +230,7 @@ class CouchrestAttachment < CouchRest::ExtendedDocument
   def remove_attachment(attachment_names)
     attachment_names = [attachment_names].flatten
     attachment_names.each do |att_name|
-      att_name = BufsEscape.escape(att_name)
+      att_name = TkEscape.escape(att_name)
       self['md_attachments'].delete(att_name)
       self['_attachments'].delete(att_name)
     end

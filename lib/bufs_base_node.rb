@@ -512,7 +512,7 @@ class BufsBaseNode
 
   def __get_attachment_metadata(attachment_name)
     all_md = __get_attachments_metadata
-    index_name = BufsEscape.escape(attachment_name)
+    index_name = TkEscape.escape(attachment_name)
     all_md[index_name.to_sym]
   end
 

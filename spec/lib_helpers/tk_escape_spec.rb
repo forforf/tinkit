@@ -10,7 +10,7 @@ doc_db_name = "http://127.0.0.1:5984/tk_escape_spec/"
 EscapeTestDB = CouchRest.database!(doc_db_name)
 EscapeTestDB.compact!
 
-describe BufsEscape do
+describe TkEscape do
 
   before(:each) do
     EscapeTestDB.recreate!
@@ -25,7 +25,7 @@ describe BufsEscape do
     EscapeTestDB.save_doc(test_doc_params)
     doc = EscapeTestDB.get(test_doc_params['_id'])
     #test
-    att_name = BufsEscape.escape(test_file_basename)
+    att_name = TkEscape.escape(test_file_basename)
     EscapeTestDB.put_attachment(doc, att_name, test_file_data)
     #verify results
     couchdb_name = EscapeTestDB.get(test_doc_params['_id'])['_attachments'].keys.first

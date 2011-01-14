@@ -622,7 +622,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
       #raise db_doc.attachment_doc_id.inspect
       att_files[user_class] = db_doc.attached_files
       att_files[user_class].size.should == 1
-      att_files[user_class].first.should == BufsEscape.escape(test_basename)
+      att_files[user_class].first.should == TkEscape.escape(test_basename)
     end
     #test
     attachment_name = test_basename
@@ -665,8 +665,8 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
       db_doc.attached_files.size.should == 2
     end
     #test
-    attachment_name1 = BufsEscape.escape(test_basename1)
-    attachment_name2 = BufsEscape.escape(test_basename2)
+    attachment_name1 = TkEscape.escape(test_basename1)
+    attachment_name2 = TkEscape.escape(test_basename2)
     @user_classes.each do |user_class|
       persist_layer_key = user_class.myGlueEnv.persist_layer_key
       doc = user_class.get(basic_docs[user_class]._model_metadata[persist_layer_key])
@@ -678,7 +678,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
       doc_id = basic_docs[user_class]._model_metadata[persist_layer_key]
       db_doc = user_class.get(doc_id)
       db_doc.attached_files.size.should == 1
-      db_doc.attached_files.first.should == BufsEscape.escape(attachment_name2)
+      db_doc.attached_files.first.should == TkEscape.escape(attachment_name2)
     end
     #delete again so that all attachments are deleted
     @user_classes.each do |user_class|
@@ -717,7 +717,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
       doc_id = basic_docs[user_class]._model_metadata[persist_layer_key]
       db_doc = user_class.get(doc_id)
       db_doc.attached_files.size.should == 1
-      db_doc.attached_files.first.should == BufsEscape.escape(test_basename)
+      db_doc.attached_files.first.should == TkEscape.escape(test_basename)
     end
     #test
     attachment_names = {}
@@ -730,7 +730,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
     #check results
     @user_classes.each do |user_class|
       attachment_names[user_class].size.should == 1
-      attachment_names[user_class].first.should == BufsEscape.escape(test_basename)
+      attachment_names[user_class].first.should == TkEscape.escape(test_basename)
     end
   end
 
@@ -759,7 +759,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
       persist_layer_key = user_class.myGlueEnv.persist_layer_key
       doc_id = basic_docs[user_class]._model_metadata[persist_layer_key]
       db_doc = user_class.get(doc_id)
-      db_doc.attached_files.first.should == BufsEscape.escape(test_basename)
+      db_doc.attached_files.first.should == TkEscape.escape(test_basename)
     end
   end
 
@@ -792,7 +792,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
       db_doc = user_class.get(doc_id)
       db_doc.attached_files.size.should == 1
       att_file = db_doc.attached_files.first
-      att_file.should == BufsEscape.escape(attach_name)
+      att_file.should == TkEscape.escape(attach_name)
       #TODO: More rigorous testing of attached data from raw data
     end
   end
@@ -820,7 +820,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
       attached_basenames[user_class] = basic_nodes[user_class].attached_files
       attached_basenames[user_class].size.should == 1
       attached_basename= attached_basenames[user_class].first
-      attached_basename.should == BufsEscape.escape(test_basename)
+      attached_basename.should == TkEscape.escape(test_basename)
       #test
       moab_att_metadata = basic_nodes[user_class].__get_attachment_metadata(attached_basename)
       md = moab_att_metadata
@@ -853,7 +853,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
       attached_basenames[user_class] = basic_nodes[user_class].attached_files
       attached_basenames[user_class].size.should == 1
       attached_basename= attached_basenames[user_class].first
-      attached_basename.should == BufsEscape.escape(test_basename)
+      attached_basename.should == TkEscape.escape(test_basename)
       #test
       moab_att_metadata = basic_nodes[user_class].__get_attachments_metadata
       md = moab_att_metadata[test_basename.to_sym]
@@ -885,7 +885,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
       attached_basenames[user_class] = basic_nodes[user_class].attached_files
       attached_basenames[user_class].size.should == 1
       attached_basename = attached_basenames[user_class].first
-      attached_basename.should == BufsEscape.escape(test_basename)
+      attached_basename.should == TkEscape.escape(test_basename)
     #test
       moab_raw_data = basic_nodes[user_class].get_raw_data(attached_basename)
       file_raw_data = File.open(test_filename, "r"){|f| f.read}
@@ -916,7 +916,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
       attached_basenames[user_class] = basic_nodes[user_class].attached_files
       attached_basenames[user_class].size.should == 1
       attached_basename = attached_basenames[user_class].first
-      attached_basename.should == BufsEscape.escape(test_basename)
+      attached_basename.should == TkEscape.escape(test_basename)
     #test
       exported_att_data = basic_nodes[user_class].__export_attachment(attached_basename)
       exported_att_data[:metadata].should == basic_nodes[user_class].__get_attachment_metadata(attached_basename)
@@ -946,7 +946,7 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
       metadata = {:file_modified => file_modified, :content_type => content_type}
       raw_data = File.open(test_filename, "r"){|f| f.read}
       import_format = {:raw_data => raw_data, :metadata => metadata}
-      att_names[user_class] = BufsEscape.escape(test_basename)
+      att_names[user_class] = TkEscape.escape(test_basename)
     #test
       basic_nodes[user_class].__import_attachment(att_names[user_class], import_format)
     end
@@ -985,9 +985,9 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
     other_node2.files_add(:src_filename => test_filename)
     #check initial conditions
     other_node1.my_category.should == my_cat1
-    other_node1.attached_files.first.should == BufsEscape.escape(test_basename)
+    other_node1.attached_files.first.should == TkEscape.escape(test_basename)
     other_node2.my_category.should == my_cat2
-    other_node2.attached_files.first.should == BufsEscape.escape(test_basename)
+    other_node2.attached_files.first.should == TkEscape.escape(test_basename)
     #test
     this_node = user_class2.__create_from_other_node(other_node1)
     #test_inverse
@@ -996,12 +996,12 @@ describe BufsNodeFactory, "Document Operations with Attachments" do
     this_node.class.should == other_node2.class
     this_node.class.should_not == other_node1.class
     this_node.my_category.should == my_cat1
-    this_node.attached_files.first.should == BufsEscape.escape(test_basename)
+    this_node.attached_files.first.should == TkEscape.escape(test_basename)
     #verify inverse
     this_other_node.class.should == other_node1.class
     this_other_node.class.should_not == other_node2.class
     this_other_node.my_category.should == my_cat2
-    this_other_node.attached_files.first.should == BufsEscape.escape(test_basename)
+    this_other_node.attached_files.first.should == TkEscape.escape(test_basename)
   end
 end
 

@@ -40,11 +40,11 @@ module CouchrestInterface
         file_datas.each do |file_data|
           #get file data
           src_filename = file_data[:src_filename]
-          src_basename = BufsEscape.escape(File.basename(src_filename))
+          src_basename = TkEscape.escape(File.basename(src_filename))
           raise "File data must include the source filename when adding a file to the model" unless src_filename
           model_basename = file_data[:model_basename] || src_basename
           model_basename.gsub!('+', ' ')  #plus signs are problematic
-          #TODO: Consider creating BufsEscape.unescape method
+          #TODO: Consider creating TkEscape.unescape method
           model_basename = CGI.unescape(model_basename)
           content_type = file_data[:content_type] || MimeNew.for_ofc_x(model_basename)
           modified_time = file_data[:modified_time] || File.mtime(src_filename).to_s
@@ -93,7 +93,7 @@ module CouchrestInterface
         end
         file_metadata['content_type'] = content_type 
         attachment_package = {}
-        unesc_attach_name = BufsEscape.unescape(attach_name)
+        unesc_attach_name = TkEscape.unescape(attach_name)
         attachment_package[unesc_attach_name] = {'data' => raw_data, 'md' => file_metadata}
         node_id = node._model_metadata[:_id]
         record = bia_class.add_attachment_package(node_id, bia_class, attachment_package)

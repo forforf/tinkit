@@ -52,7 +52,7 @@ module SdbS3Interface
 
       filenames.each do |filename|
         basename = File.basename(filename)
-        esc_basename = BufsEscape.escape(basename)
+        esc_basename = TkEscape.escape(basename)
         begin
           S3::S3Object.store(esc_basename, open(filename), @bucket_name)
         rescue AWS::S3::NoSuchBucket
@@ -64,15 +64,15 @@ module SdbS3Interface
       files = self.list_attachments
     
       filenames.each do |f|
-        bname = BufsEscape.escape(File.basename(f))
-        esc_bname = BufsEscape.escape(bname)
+        bname = TkEscape.escape(File.basename(f))
+        esc_bname = TkEscape.escape(bname)
         retry_request { S3::S3Object.store(esc_bname, open(f), @bucket_name) } unless files.include?(esc_bname)
       end
       
       #update the metadata (have to wait until they're uploaded *sigh*
       filenames.each do |f|
         basename = File.basename(f)
-        attach_name = BufsEscape.escape(basename)
+        attach_name = TkEscape.escape(basename)
         begin
           s3_obj = S3::S3Object.find(attach_name, @bucket_name)
         rescue AWS::S3::NoSuchBucket
@@ -84,12 +84,12 @@ module SdbS3Interface
         s3_obj.store
       end
       
-      filenames.map {|f| BufsEscape.escape(File.basename(f))} #return basenames
+      filenames.map {|f| TkEscape.escape(File.basename(f))} #return basenames
     end
 
     def add_raw_data(node, file_name, content_type, raw_data, file_modified_at = nil)
       
-      attach_name = BufsEscape.escape(file_name)
+      attach_name = TkEscape.escape(file_name)
       
       options = {:content_type => content_type}
 #=begin
@@ -137,7 +137,7 @@ module SdbS3Interface
     def get_raw_data(node, basename)
       rtn = nil
       
-      attach_name = BufsEscape.escape(basename)
+      attach_name = TkEscape.escape(basename)
 
       begin
         rtn = S3::S3Object.value(attach_name, @bucket_name)
@@ -216,7 +216,7 @@ module SdbS3Interface
     
     def subtract_some(file_basenames)
       file_basenames.each do |basename|
-        attach_name = BufsEscape.escape(basename)
+        attach_name = TkEscape.escape(basename)
         S3::S3Object.delete(attach_name, @bucket_name)
       end
     end
