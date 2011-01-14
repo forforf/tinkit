@@ -91,9 +91,9 @@ end
   
   #In the future you won't need seperate classes for the models.
   
-  ExampleCouchClass = BufsNodeFactory.make(couch_env)
-  ExampleFileClass = BufsNodeFactory.make(filesys_env)
-  ExampleSdbS3Class = BufsNodeFactory.make(sdbs3_env)
+  ExampleCouchClass = TinkitNodeFactory.make(couch_env)
+  ExampleFileClass = TinkitNodeFactory.make(filesys_env)
+  ExampleSdbS3Class = TinkitNodeFactory.make(sdbs3_env)
   a_couch_node = ExampleCouchClass.new({:id => "My_ID1", :data => "Hello World from couchrest"})
   
   

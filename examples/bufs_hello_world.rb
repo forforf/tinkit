@@ -17,7 +17,7 @@ env = {:node_class_id => "HelloWorldClass",
        }
 }
 
-MyNodeClass = BufsNodeFactory.make(env)
+MyNodeClass = TinkitNodeFactory.make(env)
 hello_world_node = MyNodeClass.new( {:id => 'hw_id', :data => "Hello World"} )
 
 #to see your node's data, just call the fields as a method call
