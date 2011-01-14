@@ -14,7 +14,7 @@ CouchDB2.compact!
 FileSystem1 = "/home/bufs/bufs/sandbox_for_specs/file_system_specs/group1"
 FileSystem2 = "/home/bufs/bufs/sandbox_for_specs/file_system_specs/group2"
 
-require File.join(DirBaseEnvHelpers, 'lib/bufs_node_factory')
+require File.join(DirBaseEnvHelpers, 'lib/tinkit_node_factory')
 
 module UserNodeSpecHelpers
   BufsNodeLibs = [File.join(DirBaseEnvHelpers,'lib/glue_envs/bufs_couchrest_glue_env')]

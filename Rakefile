@@ -24,7 +24,7 @@ spec_set_1 = ['spec/couchdb_running_spec.rb',
 spec_set_2 = ['spec/node_element_operations_spec.rb']
 
 #model tests for multi-user
-spec_set_3 = ['spec/bufs_node_factory_spec.rb']
+spec_set_3 = ['spec/tinkit_node_factory_spec.rb']
 
 #These tests would share common variable namespaces
 #and will clobber each other if ran in a common environment
