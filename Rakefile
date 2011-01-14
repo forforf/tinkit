@@ -14,7 +14,7 @@ end
 #task :default => ['specs_with_rcov']
 
 #Tests that fail in rake but work standalone
-spec_set_0 = ['spec/bufs_escape_spec.rb']
+spec_set_0 = ['spec/tk_escape_spec.rb']
 
 #fixture tests
 spec_set_1 = ['spec/couchdb_running_spec.rb', 

@@ -5,7 +5,7 @@ require File.join(File.dirname(__FILE__), '/helpers/require_helper')
 require Bufs.midas 'node_element_operations'
 require Bufs.helpers 'hash_helpers'
 require Bufs.helpers 'camel'
-require Bufs.lib 'bufs_escape'
+require Bufs.helpers 'tk_escape'
 require Bufs.helpers 'log_helper'
 
 

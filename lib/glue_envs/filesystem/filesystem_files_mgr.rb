@@ -4,7 +4,7 @@ require 'json'
 #Bufs directory organization defined in lib/helpers/require_helper
 require Bufs.helpers 'mime_types_new'
 require Bufs.helpers 'log_helper'
-require Bufs.lib 'bufs_escape'  #TODO: move to helpers
+require Bufs.helpers 'tk_escape'  #TODO: move to helpers
 
 #TODO: Move this into a MonkeyPatch named module (called by file glue)
 # Bufs.monkey_patch punching_dir  or something

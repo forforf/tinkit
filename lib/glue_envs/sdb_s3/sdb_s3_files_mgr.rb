@@ -1,6 +1,6 @@
 #require helper for cleaner require statements
 require File.join(File.expand_path(File.dirname(__FILE__)), '../../../lib/helpers/require_helper')
-require Bufs.lib 'bufs_escape'
+require Bufs.helpers 'tk_escape'
 
 require 'aws/s3'
 

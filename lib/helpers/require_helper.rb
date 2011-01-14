@@ -1,6 +1,4 @@
-#bootstrap requires follow module
-
-#Bufs Library Locations
+#Tinkit Library Locations
 module Bufs
   @@top = File.join(File.dirname(__FILE__), '../..')  #main bufs directory
   @@lib = File.join(@@top, 'lib/')

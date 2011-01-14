@@ -2,7 +2,7 @@ require 'cgi'
 require 'couchrest'
 
 #Bufs directory organization defined in lib/helpers/require_helper.rb
-require Bufs.lib 'bufs_escape'
+require Bufs.helpers 'tk_escape'
 require Bufs.helpers 'mime_types_new'
 
 #Performs manipulations ont file attachment structures and metadata
