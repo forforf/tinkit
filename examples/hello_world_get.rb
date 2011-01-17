@@ -29,3 +29,6 @@ puts Tinkit::HelloWorldClass.get("helloworld_id").data
 
 #or by searching for data
 puts Tinkit::HelloWorldClass.find_nodes_where(:data, :equals, "Hello World").first.data
+
+#delete the data
+Tinkit::HelloWorldClass.destroy_all
