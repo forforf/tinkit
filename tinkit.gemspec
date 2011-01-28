@@ -12,4 +12,16 @@ gem_spec = Gem::Specification.new do |s|
   s.homepage = "http://github.com/forforf/tinkit"
   s.require_path = 'lib'
   s.files = %w(LICENSE README Rakefile) + Dir.glob("{lib,spec,examples}/**/*")
+  #core dependencies
+  s.add_dependency "log4r", "~> 1.1.9"
+  s.add_dependency "mime-types", "~> 1.16"
+  #CouchDB interface dependencies
+  s.add_dependency "couchrest", "= 0.35"
+  s.add_dependency "rest-client", "<= 1.2.0"
+  #mysql interface dependencies
+  s.add_dependency "dbi", "~> 0.4.5"
+  s.add_dependency "dbd-mysql", "~> 0.4.4"
+  #sdb/s3 dependencies (ultimately depends on lib curl
+  s.add_dependency "forforf-aws-sdb", ">= 0.5.1"
+  s.add_dependency "aws-s3", "~> 0.6.2"
 end

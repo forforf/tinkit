@@ -1,6 +1,9 @@
 #require helper for cleaner require statements
 require File.join(File.dirname(__FILE__), '/helpers/require_helper')
 
+#other libraries
+require 'xmlsimple'
+
 #bufs libraries
 require Tinkit.midas 'node_element_operations'
 require Tinkit.helpers 'hash_helpers'
@@ -516,8 +519,11 @@ class TinkitBaseNode
     all_md[index_name.to_sym]
   end
 
-
-
+  #TODO: Add to specs
+  #outputs the node data as an xml snippet
+  def __to_xml
+    XmlSimple.xml_out(@_user_data, 'NoAttr' => true)
+  end
   #Deprecated Methods------------------------
   #Adds parent categories, it can accept a single category or an array of categories
   #aliased for backwards compatibility, this method is dynamically defined and generated

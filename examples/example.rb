@@ -1,4 +1,4 @@
-require '../lib/bufs'  #<-- eventually will be gem 'bufs'
+require '../lib/tinkit'  #<-- eventually will be gem 'bufs'
 #require '../lib/moabs/moab_couchrest_env'
 #equire '../lib/glue_envs/bufs_couchrest_glue_env'
 #require '../lib/midas/node_element_operations'
@@ -77,10 +77,10 @@ end
   sdbs3_path = "MyDomain"
   #filesystem doesn't require host
   #building the couchrest environment
-  couch_env = NodeHelper.env_builder("bufs_couchrest", couch_class_id, user_id, cr_path, cr_host)
+  couch_env = NodeHelper.env_builder("couchrest", couch_class_id, user_id, cr_path, cr_host)
   
   #building the filesystem environment
-  filesys_env = NodeHelper.env_builder("bufs_filesystem", file_class_id, user_id, fs_path)
+  filesys_env = NodeHelper.env_builder("filesystem", file_class_id, user_id, fs_path)
   #p couch_env
   
   #building an environment for AWS (Simple DB for data, S3 for attachments)
@@ -162,6 +162,10 @@ end
   puts "Calling views (filtering records)"
   p hello_world_node.class.call_new_view(:id, "My_ID1")
   p a_file_node.class.call_new_view(:data, "Hello World from filesystem")
+
+  puts "XML out"
+  p hello_world_node.__to_xml
+  p a_file_node.__to_xml
 
   
   puts "Ok, now lets subtract (later)"
