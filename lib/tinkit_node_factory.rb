@@ -18,6 +18,36 @@ class TinkitNodeFactory
   #Set Logger
   @@log = TinkitLog.set(self.name, :debug)
 
+  #Some sugar to help contruct a node environment.
+  #It will put properly format supplied data.
+  #Note that the model name must already be defined as a model
+  #in the glue_env!
+  #TODO: Add to specs
+  def self.env_formatter(model_name, node_class_id, user_id, path, host = nil)
+            #binding data (note this occurs in two different places in the env)
+
+    key_fields = {:required_keys => [:id],
+                         :primary_key => :id }
+
+
+    #data model
+    field_op_set =nil
+    #op_set_mod => <Using default definitions>
+
+    data_model = {:field_op_set => field_op_set, :key_fields => key_fields, :views => nil}
+
+    #persistence layer model
+    pmodel_env = { :host => host,
+                          :path => path,
+                          :user_id => user_id}
+    persist_model = {:name => model_name, :env => pmodel_env}
+
+    #final env model
+    env = { :node_class_id => node_class_id,
+                :data_model => data_model,
+                :persist_model => persist_model }
+  end
+
   # Builds the class from the provided environment
   # the environment takes the following form
   #   :node_class_id  -  The Name of the class to create

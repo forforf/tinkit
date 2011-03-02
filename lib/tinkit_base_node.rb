@@ -521,8 +521,9 @@ class TinkitBaseNode
 
   #TODO: Add to specs
   #outputs the node data as an xml snippet
-  def __to_xml
-    XmlSimple.xml_out(@_user_data, 'NoAttr' => true)
+  def __to_xml(root_name = nil)
+    root_name = root_name || 'tinkit_node'
+    XmlSimple.xml_out(@_user_data, 'AttrPrefix' => true, 'RootName' => root_name)
   end
   #Deprecated Methods------------------------
   #Adds parent categories, it can accept a single category or an array of categories
@@ -610,6 +611,7 @@ class TinkitBaseNode
         actual class: #{self.class}
         method: #{meth_sym.inspect}
         args: #{args.inspect}
+        user_data: #{@_user_data.inspect}
       ERRORINFO
   end
   
