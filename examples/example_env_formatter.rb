@@ -1,6 +1,8 @@
-require '../lib/tinkit'  #<-- eventually will be gem 'bufs'
+
+require '../lib/tinkit'
+#require 'tinkit'  #<-- eventually will be gem 'bufs'
 #require '../lib/moabs/moab_couchrest_env'
-#equire '../lib/glue_envs/bufs_couchrest_glue_env'
+#require '../lib/glue_envs/bufs_couchrest_glue_env'
 #require '../lib/midas/node_element_operations'
 
 #We need to define the datastructure we'll be starting with.  We can change it dynamically as well,
@@ -30,8 +32,8 @@ require '../lib/tinkit'  #<-- eventually will be gem 'bufs'
 #If you have CouchRest:
   #Lets create a couchrest instance to interface to our CouchDB
   require 'couchrest'
-  example_couchdb_location = "http://127.0.0.1:5984/example/"
-  #example_couchdb_location = "http://bufs.couchone.com/example"
+  #example_couchdb_location = "http://127.0.0.1:5984/example/"
+  example_couchdb_location = "http://bufs.couchone.com/example"
   couchrest_instance = CouchRest.database!(example_couchdb_location)
   
   #while we're at it, lets create a filesystem store as well

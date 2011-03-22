@@ -96,7 +96,6 @@ end
   ExampleSdbS3Class = TinkitNodeFactory.make(sdbs3_env)
   a_couch_node = ExampleCouchClass.new({:id => "My_ID1", :data => "Hello World from couchrest"})
   
-  
   a_file_node = ExampleFileClass.new({:id => "My_ID2", :data =>"Hello World from filesystem" })
   
   a_sdbs3_node = ExampleSdbS3Class.new({:id => "My_ID2", :data =>"Hello World from AWS Simple DB (with S3 for files)" })
