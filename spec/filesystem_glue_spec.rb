@@ -85,7 +85,6 @@ describe FilesystemEnv::GlueEnv, "Persistent Layer Basic Operations" do
     #Don't use native get_attributes, use obj's get,  it will block until save is finished
     persisted_data = @filesystem_glue_obj.get(data1[:my_id]) 
     persisted_data.should_not == nil
-    #p persisted_data
     persisted_data[:my_id].should == data1[:my_id]
     persisted_data[:data].should == data1[:data]
   end
