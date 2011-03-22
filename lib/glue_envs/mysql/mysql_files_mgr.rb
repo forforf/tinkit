@@ -2,6 +2,7 @@ require 'dbi'
 require 'json'
 
 require Tinkit.helpers 'mime_types_new'
+require Tinkit.helpers 'tk_escape.rb'
 
 module MysqlInterface
   class FilesMgr
