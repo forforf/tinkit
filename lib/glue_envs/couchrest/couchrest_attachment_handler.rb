@@ -1,9 +1,11 @@
 require 'cgi'
 require 'couchrest'
+require 'couchrest_extended_document'
 
 #Tinkit directory organization defined in lib/helpers/require_helper.rb
 require Tinkit.helpers 'tk_escape'
 require Tinkit.helpers 'mime_types_new'
+#require Tinkit.helpers 'hash_helpers'
 
 #Performs manipulations ont file attachment structures and metadata
 module CouchrestAttachmentHelpers
@@ -42,8 +44,15 @@ module CouchrestAttachmentHelpers
           obj_params = split_metadata['cust_md']
         end
       end
+      #Not completely sure converting content type to a symbol was the problem,
+      # but it works now
+      #Investigate further time permitting.
+      #couchrest change forced this workaround
+      att_params[:content_type] = att_params['content_type']
+      att_params.delete('content_type')
+
       all_couch_attach_params[esc_att_name] = att_params
-      all_custom_attach_params[esc_att_name] = obj_params
+      all_custom_attach_params[esc_att_name] = obj_params 
       all_attach_data[esc_att_name] = attach_data
     end
     sorted =  {'data_by_name' => all_attach_data,
@@ -108,7 +117,7 @@ end
 class CouchrestAttachment < CouchRest::ExtendedDocument
   
   #CouchDB attachment metadata parameters supported by CouchrestAttachment
-  CouchDBAttachParams = ['content_type', 'stub']
+  CouchDBAttachParams = ['content_type', 'stub'  ]
   
   #changing this will result in existing persisted data being lost
   #(unless the persisted data is updated as well)
@@ -143,7 +152,7 @@ class CouchrestAttachment < CouchRest::ExtendedDocument
     custom_metadata_doc_params = {'_id' => att_doc_id, 'md_attachments' => sorted_attachments['cust_md_by_name']}
     att_doc = attach_class.new(custom_metadata_doc_params)
     att_doc.save
-    
+ 
     sorted_attachments['att_md_by_name'].each do |att_name, params|
       esc_att_name = TkEscape.escape(att_name)
       att_doc.put_attachment(esc_att_name, sorted_attachments['data_by_name'][esc_att_name],params)
@@ -214,6 +223,12 @@ class CouchrestAttachment < CouchRest::ExtendedDocument
     return nil unless att_doc
     custom_md = att_doc['md_attachments']
     esc_couch_md = att_doc['_attachments']
+    md_no_att = custom_md && !esc_couch_md
+    att_no_md = esc_couch_md && !custom_md
+    raise "DB Record corrupted? Attachment metadata exists,"\
+          " but no attachments for #{att_doc['_id'].inspect}" if md_no_att 
+    raise "DB Record corrupted? Attachments exist, but no metadata"\
+          " is associated with it for #{att_doc['_id'].inspect}" if att_no_md
     couch_md = CouchrestAttachmentHelpers.unescape_names_in_attachments(esc_couch_md)
     if custom_md.keys.sort != couch_md.keys.sort
       raise "data integrity error, attachment metadata inconsistency\n"\

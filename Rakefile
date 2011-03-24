@@ -28,8 +28,9 @@ Jeweler::Tasks.new do |gem|
   gem.add_dependency "log4r", "~> 1.1.9"
   gem.add_dependency "mime-types", "~> 1.16"
   #CouchDB interface dependencies
-  gem.add_dependency "couchrest", "= 0.35"
-  gem.add_dependency "rest-client", "<= 1.2.0"
+  gem.add_dependency "couchrest", "~> 1.0.2"
+  gem.add_dependency "couchrest_extended_document", "~> 1.0.0"
+  gem.add_dependency "rest-client", "~> 1.6.1"
   #mysql interface dependencies
 
 end
