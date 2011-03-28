@@ -387,7 +387,7 @@ attr_accessor :user_id,
   end
   
   def convert_node_value_to_file_value(node_key_value)
-    file_base_value = node_key_value.gsub("::", "_")
+    file_base_value = node_key_value.to_s.gsub("::", "_")
     file_value = File.join(@user_datastore_location, file_base_value)
   end
   
