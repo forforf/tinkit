@@ -50,7 +50,7 @@ module FilesystemInterface
     def initialize(node_env, node_key)
       #for bufs node_key is the value of :my_category
       @node_key = node_key
-      @attachment_location = File.join(node_env.user_datastore_location, node_key)
+      @attachment_location = File.join(node_env.user_datastore_location, node_key.to_s)
     end
 
     #TODO: Is passing node in methods duplicative now that the moab FileMgr is bound to an env at initialization?
