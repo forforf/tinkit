@@ -525,6 +525,19 @@ class TinkitBaseNode
     root_name = root_name || 'tinkit_node'
     XmlSimple.xml_out(@_user_data, 'AttrPrefix' => true, 'RootName' => root_name)
   end
+
+  #these add hash like syntax to node setters and getters
+  #get
+  def [](field)
+    self.__send__(field.to_sym)
+  end
+  
+  #set
+  def []=(field, data)
+    assignment_field = "_add" #for Node Element Operations
+    assignment_method = "#{field}#{assignment_field}".to_sym
+    self.__send__(assignment_method, data)
+  end
   #Deprecated Methods------------------------
   #Adds parent categories, it can accept a single category or an array of categories
   #aliased for backwards compatibility, this method is dynamically defined and generated
