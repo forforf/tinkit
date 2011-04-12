@@ -246,7 +246,7 @@ describe TinkitNodeFactory, "Basic Operations" do
     end
     new_cat = 'new parent cat'
 
-    #test
+    #test via normal method add
     @user_classes.each do |user_class|
      docs_with_new_parent_cat[user_class].parent_categories_add(new_cat)
      aftersave_revs[user_class] = docs_with_new_parent_cat[user_class]._model_metadata[:_rev]
@@ -269,6 +269,32 @@ describe TinkitNodeFactory, "Basic Operations" do
         docs_with_new_parent_cat[user_class].__send__(param).should == db_param
       end
     end
+
+    #test via hash setters and getters
+    @user_classes.each do |user_class|
+     docs_with_new_parent_cat[user_class][:parent_categories] = new_cat
+     aftersave_revs[user_class] = docs_with_new_parent_cat[user_class]._model_metadata[:_rev]
+     #puts "AS: #{user_class.inspect} rev: #{aftersave_revs[user_class].inspect}"
+    end
+
+    #check results
+    @user_classes.each do |user_class|
+      #check doc in memory
+      docs_with_new_parent_cat[user_class][:parent_categories].should include new_cat
+      #check database
+      doc_params[user_class].keys.each do |param|
+        persist_layer_key = user_class.myGlueEnv.persist_layer_key
+        node = docs_with_new_parent_cat[user_class]
+        node_id = node._model_metadata[persist_layer_key]
+        model_node = node.class.get(node_id)
+        db_param = model_node[param.to_sym]
+        docs_with_new_parent_cat[user_class]._user_data[param].should == db_param
+        #test accessor method
+        docs_with_new_parent_cat[user_class].__send__(param).should == db_param
+      end
+    end
+
+
   end
 
   it "should add categories to existing categories and existing doc" do
