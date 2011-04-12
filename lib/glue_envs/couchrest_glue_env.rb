@@ -313,7 +313,7 @@ class GlueEnv
     
     def set_attach_class(db_root_location, attach_class_name)
     dyn_attach_class_def = "class #{attach_class_name} < CouchrestAttachment
-      use_database CouchRest.database!(\"http://#{db_root_location}/\")
+      use_database CouchRest.database!(\"#{db_root_location}/\")
  
       def self.namespace
         CouchRest.database!(\"http://#{db_root_location}/\")
