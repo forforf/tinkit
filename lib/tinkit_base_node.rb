@@ -538,6 +538,13 @@ class TinkitBaseNode
     assignment_method = "#{field}#{assignment_field}".to_sym
     self.__send__(assignment_method, data)
   end
+
+  #also use has_key? to find out if user_data has that key
+  #TODO add to spec
+
+  def has_key?(key_to_check)
+    @_user_data.has_key?(key_to_check)
+  end
   #Deprecated Methods------------------------
   #Adds parent categories, it can accept a single category or an array of categories
   #aliased for backwards compatibility, this method is dynamically defined and generated
