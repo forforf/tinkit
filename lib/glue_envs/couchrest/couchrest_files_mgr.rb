@@ -128,7 +128,9 @@ module CouchrestInterface
         bia_class = node.my_GlueEnv.moab_data[:attachClass]
         node_id = node._model_metadata[:_id]
         bia_doc_id = bia_class.uniq_att_doc_id(node_id)
-        bia_doc = bia_class.get(bia_doc_id)
+        node_db = node.my_GlueEnv.moab_data[:db]
+        bia_doc = bia_class.get(bia_doc_id, node_db)
+        #bia_doc = self.class.get_att_doc(node_id)
         return nil unless bia_doc
         begin
           rtn = bia_doc.fetch_attachment(model_basename)
@@ -142,8 +144,13 @@ module CouchrestInterface
         bia_class = node.my_GlueEnv.moab_data[:attachClass]
         node_id = node._model_metadata[:_id]
         bia_doc_id = bia_class.uniq_att_doc_id(node_id)
-        bia_doc = bia_class.get(bia_doc_id)
+        node_db = node.my_GlueEnv.moab_data[:db]
+        #passing the db directly because the base class clobbers it
+        #TODO: Another reason to get rid of extended document
+        bia_doc = bia_class.get(bia_doc_id, node_db)
+        #bia_doc = self.class.get_att_doc(node_id)
         atts = bia_doc.get_attachments
+        #atts = bia_doc["_attachments"]
         md_symified = {}
         atts.each do |k,v|
           v_symified = HashKeys.str_to_sym(v)
@@ -156,7 +163,8 @@ module CouchrestInterface
         bia_class = node.my_GlueEnv.moab_data[:attachClass]
         node_id = node._model_metadata[:_id]
         bia_doc_id = bia_class.uniq_att_doc_id(node_id)
-        bia_doc = bia_class.get(bia_doc_id)
+        node_db = node.my_GlueEnv.moab_data[:db]
+        bia_doc = bia_class.get(bia_doc_id, node_db)
         return nil unless bia_doc
         bia_class.get_attachments(bia_doc).keys
       end
@@ -167,7 +175,8 @@ module CouchrestInterface
         node_id = node._model_metadata[:_id]
         bia_doc_id = bia_class.uniq_att_doc_id(node_id)
         if bia_doc_id
-          bia_doc = bia_class.get(bia_doc_id)
+          node_db = node.my_GlueEnv.moab_data[:db]
+          bia_doc = bia_class.get(bia_doc_id, node_db)
           raise "No attachment handler found for node: #{node.inspect}" unless bia_doc
           bia_doc.remove_attachment(model_basenames)
           rem_atts = bia_doc.get_attachments
@@ -185,7 +194,8 @@ module CouchrestInterface
         node_id = node._model_metadata[:_id]
         bia_doc_id = bia_class.uniq_att_doc_id(node_id)
         if bia_doc_id
-          attach_doc = bia_class.get(bia_doc_id)
+          node_db = node.my_GlueEnv.moab_data[:db]
+          attach_doc = bia_class.get(bia_doc_id, node_db)
           doc_db.delete_doc(attach_doc)
           #node.__unset_userdata_key(:attachment_doc_id)
           #node.__save
