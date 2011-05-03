@@ -45,8 +45,8 @@ tinkit_class = TinkitNodeFactory.make(tinkit_env)
 #tinkits = []
 bufs_data.each do |bufs_node|
   tinkit_data = {}
-  tinkit_data[:id] = "tid_#{bufs_node.my_category}"
-  tinkit_data[:label] = bufs_node.my_category
+  tinkit_data[:id] = bufs_node.my_category
+  tinkit_data[:label] = "label_#{bufs_node.my_category}"
   tinkit_data[:description] = bufs_node.description
   tinkit_data[:links] = bufs_node.links
   tinkit_data[:parents] = bufs_node.parent_categories
@@ -59,6 +59,7 @@ bufs_data.each do |bufs_node|
   tinkit_node.__save
   #Handle Attachments
   atts = bufs_node.attached_files
+  p atts
   if atts
     atts.each do |att|
       tinkit_node.__import_attachment(att, bufs_node.__export_attachment(att))
