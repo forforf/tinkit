@@ -534,9 +534,23 @@ class TinkitBaseNode
   
   #set
   def []=(field, data)
-    assignment_field = "_add" #for Node Element Operations
-    assignment_method = "#{field}#{assignment_field}".to_sym
-    self.__send__(assignment_method, data)
+    if has_key?(field)
+      assignment_field = "_add" #for Node Element Operations
+      assignment_method = "#{field}#{assignment_field}".to_sym
+      self.__send__(assignment_method, data)
+    else
+      #make educated guess as to data type
+      #if array then ops -> list_ops
+      #TODO if hash with hash values being arrays -> key_list_ops
+      data_ops = if data.is_a?(Array)
+        :list_ops
+      else
+        :replace_ops
+      end
+      new_op = {field => data_ops}
+      self.class.data_struc.set_op(new_op)
+      self.__set_userdata_key(field, data)
+    end
   end
 
   #also use has_key? to find out if user_data has that key
