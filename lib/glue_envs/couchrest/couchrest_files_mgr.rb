@@ -133,7 +133,7 @@ module CouchrestInterface
         #bia_doc = self.class.get_att_doc(node_id)
         return nil unless bia_doc
         begin
-          rtn = bia_doc.fetch_attachment(model_basename)
+          rtn = node_db.fetch_attachment(bia_doc, model_basename)
         rescue RestClient::ResourceNotFound
           return nil
         end
