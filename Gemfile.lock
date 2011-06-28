@@ -1,14 +1,41 @@
+PATH
+  remote: .
+  specs:
+    tinkit (0.0.6)
+      couchrest (~> 1.0.2)
+      couchrest_extended_document (~> 1.0.0)
+      log4r (~> 1.1.9)
+      mime-types (~> 1.16)
+      rest-client (~> 1.6.1)
+      xml-simple (~> 1.0.13)
+
 GEM
   remote: http://rubygems.org/
   specs:
+    activesupport (3.0.9)
+    builder (3.0.0)
+    couchrest (1.0.2)
+      json (~> 1.5.1)
+      mime-types (~> 1.15)
+      rest-client (~> 1.6.1)
+    couchrest_extended_document (1.0.0)
+      activesupport (>= 2.3.0)
+      builder (>= 2.1.2)
+      couchrest (>= 1.0.0)
+      mime-types (>= 1.15)
     diff-lcs (1.1.2)
     git (1.2.5)
     jeweler (1.5.2)
       bundler (~> 1.0.0)
       git (>= 1.2.5)
       rake
+    json (1.5.3)
+    log4r (1.1.9)
+    mime-types (1.16)
     rake (0.8.7)
     rcov (0.9.9)
+    rest-client (1.6.3)
+      mime-types (>= 1.16)
     rspec (2.3.0)
       rspec-core (~> 2.3.0)
       rspec-expectations (~> 2.3.0)
@@ -17,7 +44,7 @@ GEM
     rspec-expectations (2.3.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.3.0)
-    xml-simple (1.1.0)
+    xml-simple (1.0.13)
 
 PLATFORMS
   ruby
@@ -27,4 +54,5 @@ DEPENDENCIES
   jeweler (~> 1.5.2)
   rcov
   rspec (~> 2.3.0)
-  xml-simple
+  tinkit!
+  xml-simple (~> 1.0.13)
