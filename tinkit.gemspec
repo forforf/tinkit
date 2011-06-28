@@ -413,7 +413,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<couchrest>, ["~> 1.0.2"])
       s.add_runtime_dependency(%q<couchrest_extended_document>, ["~> 1.0.0"])
       s.add_runtime_dependency(%q<rest-client>, ["~> 1.6.1"])
-      s.add_runtime_dependency(%q<mxl-simple>, ["~> 1.0.13"])
+      s.add_runtime_dependency(%q<xml-simple>, ["~> 1.0.13"])
     else
       s.add_dependency(%q<rspec>, ["~> 2.3.0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
@@ -424,7 +424,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<couchrest>, ["~> 1.0.2"])
       s.add_dependency(%q<couchrest_extended_document>, ["~> 1.0.0"])
       s.add_dependency(%q<rest-client>, ["~> 1.6.1"])
-      s.add_dependency(%q<mxl-simple>, ["~> 1.0.13"])
+      s.add_dependency(%q<xml-simple>, ["~> 1.0.13"])
 
     end
   else
@@ -437,7 +437,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<couchrest>, ["~> 1.0.2"])
     s.add_dependency(%q<couchrest_extended_document>, ["~> 1.0.0"])
     s.add_dependency(%q<rest-client>, ["~> 1.6.1"])
-    s.add_dependency(%q<mxl-simple>, ["~> 1.0.13"])
+    s.add_dependency(%q<xml-simple>, ["~> 1.0.13"])
   end
 end
 
