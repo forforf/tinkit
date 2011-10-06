@@ -59,7 +59,6 @@ end
 module TinkitStore
   module CouchDb
     Config = SpecConfig::ConfigData[:TinkitStore][:CouchDb]
-    #p Config
 
     #Specific CouchDb Types
     db_sources = SpecConfig::ConfigData[:TinkitStore][:CouchDb]
