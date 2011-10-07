@@ -4,12 +4,14 @@ require_relative '../lib/helpers/require_helper'
 require 'rspec'
 require 'couchrest'
 
-require_relative 'spec_config'
+require Tinkit.config 'tinkit_config'
 
 describe CouchRest::Database do
   before :all do
-    @stores = TinkitStore.build_stores
-    @couchdb = @stores[:CouchDb]
+    TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+
+    @stores = TinkitConfig.activate_stores( ['iris'], 'tinkit_spec_dummy')
+    @couchdb = @stores['iris'].store
   end
 
   it "should be running and have records" do

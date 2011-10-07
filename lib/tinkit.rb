@@ -36,3 +36,6 @@ require 'helpers/require_helper'
 
 require Tinkit.lib 'tinkit_node_factory'
 
+module Tinkit
+end
+

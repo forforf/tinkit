@@ -4,6 +4,10 @@ require 'json'
 
 require_relative 'sens_data'
 
+module Tinkit
+  DatastoreConfig = "../../../sens_data/tinkit_setup_data"
+end
+
 module TinkitConfig
   @@config_file_location = nil
   
@@ -17,10 +21,13 @@ module TinkitConfig
 
   class Resp
     attr_reader :success_flag, :type, :native
+    attr_accessor :store
+
     def initialize(type, native)
       @type = type
       @native = native
       @success_flag = parse_resp(type, native)
+      @store = nil
     end
 
    #ToDo: Move Parsing functions to module in the datastore models
@@ -67,16 +74,18 @@ module TinkitConfig
     userinfo = args[:user]
     db_path = "/" + db_name
     url = URI::HTTP.build :userinfo => userinfo, :host => host, :path => db_path, :port => 5984
-    CouchRest.database! url.to_s
+    store = CouchRest.database! url.to_s
     native_resp_json = `curl -sX GET #{url.to_s}`
-    Resp.new('couchdb', native_resp_json)
+    resp = Resp.new('couchdb', native_resp_json)
+    resp.store = store
+    return resp
   end
 
   def self.activate_stores(store_names, tinkit_store_name)
     raise "Configuration file location not set. Use:  #{self.name}.set_config_file_location(\"path/to/config/file\")" unless @@config_file_location
-    resps = []
+    resps = {}
     store_names.each do |store_name|
-      resps << self.activation(store_name, tinkit_store_name)
+      resps[store_name] =  self.activation(store_name, tinkit_store_name)
     end
     resps
   end

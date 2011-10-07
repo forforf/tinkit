@@ -65,13 +65,13 @@ describe "Activating Stores", TinkitConfig do
   it "should provide informative response if db doesnt exist" do
     resps = TinkitConfig.activate_stores(['iris'], 'some_db_name')
     resps.size.should == 1
-    resps.first.success_flag.should == false
+    resps['iris'].success_flag.should == false
   end
 
   it "should activate couchdb store" do
     TinkitConfig.set_config_file_location SensDataLocation
     resps = TinkitConfig.activate_stores( ['iris'], 'tinkit_spec_dummy')
     resps.size.should == 1
-    resps.first.success_flag.should == true
+    resps['iris'].success_flag.should == true
   end
 end
