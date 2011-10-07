@@ -3,36 +3,8 @@ require 'json'
 require 'couchrest'
 
 module SpecConfig
-  SensitiveDataFile = "../../../sens_data/tinkit_setup_data"
-  #Set up which datastores to use for testing
-  #user names and passwords are stored elsewhere for security
-  SensFile = File.expand_path(SensitiveDataFile)
 
-  ##Uncomment to create the file with data
-  #data = { "TinkitStore" => { "CouchDb" => { "default" => { "user" => some user, "pw" => secret pw } } } }
-  #File.open(SensFile, 'w+'){|f| f.write data.to_json}
-  sens_json = File.open(SensFile, 'r') {|f| f.read }
-  SensInfo = JSON.parse(sens_json)
-
-  ConfigData = {
-    :TinkitStore => {
-      :CouchDb => {
-        :default_store => :Iris,
-        :Iris => {
-          :host => "forforf.iriscouch.com",
-          :name => "tinkit_spec_tests"
-        },
-        :DevDb => {
-          #When ec2 micros can be hosted in vpcs these can be fixed addresses
-          :host => "ec2-184-72-148-99.compute-1.amazonaws.com",
-          :name => "tinkit_spec_tests",
-          :user => SensInfo["TinkitStore"]["CouchDb"]["default"]["user"],
-          :pw => SensInfo["TinkitStore"]["CouchDb"]["default"]["pw"]
-        }
-
-      }
-    }
-  }
+  ConfigData = 
 
 
 

@@ -1,0 +1,7 @@
+#List of Available Tinkit Hosts
+couchdb_hosts:
+  iris:
+    host: "forforf.iriscouch.com" 
+  dev_db:
+    host: "ec2-107-20-64-85.compute-1.amazonaws.com"
+

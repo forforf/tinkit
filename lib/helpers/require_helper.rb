@@ -3,12 +3,17 @@ module Tinkit
   @@top = File.join(File.dirname(__FILE__), '../..')  #main bufs directory
   @@lib = File.join(@@top, 'lib/')
   @@helpers = File.join(@@top, 'lib/helpers/')
+  @@config = File.join(@@lib, 'config_helpers')
   @@moabs = File.join(@@lib, 'moabs')
   @@midas = File.join(@@lib, 'midas')
   @@glue = File.join(@@lib, 'glue_envs')
   @@specs = File.join(@@top, 'spec')
   @@spec_helpers = File.join(@@specs, 'helpers')
   @@fixtures = File.join(@@top, 'bufs_fixtures')
+
+  def self.config(req_file)
+    File.expand_path(File.join(@@config, req_file))
+  end
 
   def self.lib(req_file)
     File.expand_path(File.join(@@lib, req_file))
