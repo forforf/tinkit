@@ -3,7 +3,16 @@ require File.join(File.expand_path(File.dirname(__FILE__)), '../lib/helpers/requ
 
 require Tinkit.glue 'couchrest_glue_env'
 
-GlueTestDb = CouchRest.database!("http://127.0.0.1:5984/couchrest_glue_test")
+require Tinkit.config 'tinkit_config'
+TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+
+
+
+TinkitResps =  TinkitConfig.activate_stores( ['iris'], 'tinkit_spec_glue_env')
+GlueTestDb = TinkitResps['iris'].store
+
+
+#GlueTestDb = CouchRest.database!("http://127.0.0.1:5984/couchrest_glue_test")
 GlueTestDb.compact!
 
 describe CouchrestEnv::GlueEnv, "Initialization" do
