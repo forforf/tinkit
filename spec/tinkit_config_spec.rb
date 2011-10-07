@@ -5,7 +5,7 @@ require 'psych'
 require Tinkit.config 'tinkit_config'
 
 module TinkitConfigSpec
-  SensDataLocation =  "../../../sens_data/tinkit_setup_data"
+  SensDataLocation =  Tinkit::DatastoreConfig 
 
   def sample_data
     data = {

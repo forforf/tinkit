@@ -4,14 +4,21 @@ require File.join(File.expand_path(File.dirname(__FILE__)), '../lib/helpers/requ
 require 'rspec'
 require 'couchrest'
 
+require Tinkit.config 'tinkit_config'
+TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+
 require Tinkit.glue 'couchrest/couchrest_files_mgr'
 
 include CouchrestInterface
 
-FileMgrTestDb = CouchRest.database!("http://127.0.0.1:5984/couchrest_file_mgr_test")
+TinkitResps =  TinkitConfig.activate_stores( ['iris'], 'tinkit_spec_filemgr')
+FileMgrTestDb = TinkitResps['iris'].store
+
+#FileMgrTestDb = CouchRest.database!("http://127.0.0.1:5984/couchrest_file_mgr_test")
 FileMgrTestDb.compact!
 
 GlueEnvMock = Struct.new(:model_key, :user_id, :moab_data)
+
 
 class MockAttachClass < CouchrestAttachment
   use_database FileMgrTestDb
@@ -140,7 +147,7 @@ describe FilesMgr, "Basic Operations" do
       file_basename = File.basename(file_data[:src_filename])
       md[file_basename][:content_type].should =~ /^text\/plain/
       time_str = md[file_basename][:file_modified]
-      Time.parse(time_str).should >= Time.now - 2 #should have been modified less than 2 seconds ago
+      Time.parse(time_str).should >= Time.now - 4 #should have been modified less than 2 seconds ago
     end
   end
   
