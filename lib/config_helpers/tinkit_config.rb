@@ -1,11 +1,12 @@
 require 'uri'
 require 'couchrest'
 require 'json'
+require 'fileutils'
 
 require_relative 'sens_data'
 
 module Tinkit
-  DatastoreConfig = "../../../sens_data/tinkit_setup_data"
+  DatastoreConfig = File.join(File.dirname(__FILE__), "../../../../sens_data/tinkit_setup_data")
 end
 
 module TinkitConfig
@@ -15,9 +16,52 @@ module TinkitConfig
     'couchdb' => {
       :method => :activate_couch,
       :args => ['host','user']
+    },
+    'file' => {
+      :method => :activate_file,
+      :args => ['host']
     }
   }
 
+  class StoreCapabilities
+    #Admin = 8
+    Read, Write, Reachable, Exists = 8,4,2,1
+    attr_reader :reach, :read, :write, :exists
+    def initialize(init_perms={})
+      reset
+      perm_keys = init_perms.delete_if{|k,v| !v }
+      perms = perm_keys.keys
+      add_permissions(perms)
+    end
+
+    def reset
+      @reach, @read, @write, @exists = 0,0,0,0
+    end
+    
+    def permissions
+      @read + @write + @reach + @exists || 0
+    end
+
+    def add_permissions(perm_list)
+      perm_list = *perm_list
+      @read = Read if  perm_list.include? :read
+      @write = Write if perm_list.include? :write
+      @reach = Reachable if perm_list.include? :reach
+      @exists = Exists if perm_list.include? :exists
+      get_permissions
+    end
+
+    def get_permissions
+      raise "Invalid Permission data" if permissions > 15
+      result = []
+      result << :read if permissions >= 8
+      result << :write if permissions >=4
+      result << :reach if permissions >= 2
+      result << :exists if permissions >= 1 
+      result << :none if permissions == 0
+      result
+    end
+  end
 
   class Resp
     attr_reader :success_flag, :type, :native
@@ -40,6 +84,8 @@ module TinkitConfig
          else
            success_flag = false
          end
+       when 'file'
+       
      end
      success_flag
    end
@@ -73,21 +119,46 @@ module TinkitConfig
     host = args[:host]
     userinfo = args[:user]
     db_path = "/" + db_name
+    #host = "forforf.iriscouch.com"
     url = URI::HTTP.build :userinfo => userinfo, :host => host, :path => db_path, :port => 5984
     store = CouchRest.database! url.to_s
-    native_resp_json = `curl -sX GET #{url.to_s}`
-    resp = Resp.new('couchdb', native_resp_json)
-    resp.store = store
-    return resp
+    #check if store exists
+    resp_ex = JSON.parse(`curl -sX GET #{url.to_s}`)
+    store_caps = StoreCapabilities.new
+    store_caps.add_permissions([:exist, :reach, :read]) if resp_ex["db_name"] == db_name
+    dummy_data = {:dummy => "Dummy"}.to_json
+    #p url.to_s
+    #check if store can be written to (and read)
+    resp_rw = JSON.parse(`curl -sX POST #{url.to_s} -H 'Content-Type:application/json' -d \'#{dummy_data}\'`)
+    store_caps.add_permissions([:write]) if resp_rw["id"]
+    #resp = Resp.new('couchdb', native_resp_json)
+    #resp.store = store
+    return store_caps
+  end
+
+  def self.activate_file(args)
+    file_store_name = args[:store_name]
+    file_store_dir = args[:host]
+    store_caps = StoreCapabilities.new
+    file_store_path = File.join(file_store_dir, file_store_name)
+    begin
+      native_resp = FileUtils.mkdir_p(file_store_path)
+      store_caps.add_permissions([:exists, :reach]) if native_resp == [ file_store_path]
+    rescue Errno::EACCES
+      #no permissions
+    end
+    store_caps.add_permissions([:write]) if File.writable?(file_store_path)
+    store_caps.add_permissions([:read]) if File.readable?(file_store_path)
+    return store_caps
   end
 
   def self.activate_stores(store_names, tinkit_store_name)
     raise "Configuration file location not set. Use:  #{self.name}.set_config_file_location(\"path/to/config/file\")" unless @@config_file_location
-    resps = {}
+    capability_resps = {}
     store_names.each do |store_name|
-      resps[store_name] =  self.activation(store_name, tinkit_store_name)
+      capability_resps[store_name] =  self.activation(store_name, tinkit_store_name)
     end
-    resps
+    capability_resps
   end
 end
 
