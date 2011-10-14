@@ -10,11 +10,6 @@ module SensData
     sens_file = File.expand_path(f) #(SensData::SensitiveDataFile)
     raise IOError, "Sensitive data file not found: #{sens_file.inspect}" unless File.exist? sens_file
  
-    ##Uncomment to create the file with data
-    #data = { "TinkitStore" => { "CouchDb" => { "default" => { "user" => some user, "pw" => secret pw } } } }
-    #File.open(SensFile, 'w+'){|f| f.write data.to_json}
-    #sens_json = File.open(sens_file, 'r') {|f| f.read }
-    #JSON.parse(sens_json)
     sens_yaml = File.open(sens_file, 'r') {|f| f.read }
     config_data = Psych.load(sens_yaml)
     raise ParseError, "Unable to parse file:#{sens_file.inspect} is it valid Yaml?" unless config_data
