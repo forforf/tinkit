@@ -5,302 +5,192 @@ require Tinkit.helpers 'log_helper'
 #Replace by using gemspce/Gemfile
 require_relative "../../../midas/lib/midas"
 
-#Define add, subtract and replace methods for different data operatios
-module DefaultOps
-  OpsList = [:add, :subtract, :replace, :get]
-  #Static Ops do not change anything
-  StaticOps = {
-    :add => lambda{|*args| self },
-    :subtract => lambda{|*args| self },
-    :replace => lambda{|*args| self }
-  }
+#Define add, subtract and replace methods for different data operations
+module NodeElementOperationsData
+  module DefaultOps
+    #ToDo: Add :get for KeyValues
+    OpsList = [:add, :subtract, :replace]
+    #Static Ops do not change anything
+    StaticOps = {
+      :add => lambda{|*args| self },
+      :subtract => lambda{|*args| self },
+      :replace => lambda{|*args| self }
+    }
 
-  ReplaceOps = {
-    :add => lambda{|x| x},
-    :subtract => lambda{|x| x == self ? nil : self}, #set to nil if self == x otherwise self
-    :replace => lambda{|x| x}
-  }
+    ReplaceOps = {
+      :add => lambda{|x| x},
+      :subtract => lambda{|x| x == self ? nil : self}, #set to nil if self == x otherwise self
+      :replace => lambda{|x| x}
+    }
 
-  ListOps = {
-    :add => lambda{|x| [*self] + [*x]},
-    :subtract => lambda{|x| [*self] - [*x]},
-    :replace => lambda{|x| [*x]}
-  }
+    ListOps = {
+      :add => lambda{|x| [*self] + [*x]},
+      :subtract => lambda{|x| [*self] - [*x]},
+      :replace => lambda{|x| [*x]}
+    }
 
-  #self must be hash!
-  KeyValReplaceOps = {
-    :add => lambda{ |h| self.merge h},
-    #remove key-val only if exact match
-    :subtract => lambda{|h| self.delete_if{|k,v| (h.keys.include? k) && (h[k] == self[k])} },
-    :replace => lambda{ |h| h }
-  }
+    #self must be hash!
+    KeyValReplaceOps = {
+      :add => lambda{ |h| self.merge h},
+      #remove key-val only if exact match
+      :subtract => lambda{|h| self.delete_if{|k,v| (h.keys.include? k) && (h[k] == self[k])} },
+      :replace => lambda{ |h| h }
+    }
 
-  #if identical key, add new val to list
-  KeyValListOps = {
-    :add => lambda do |h|
-      combined_keys = (h.keys + self.keys).uniq
-      combined = {}
-      combined_keys.each do |k|
-        combined_vals = ([*self[k]] + [*h[k]]).uniq
-        combined_vals.compact!
-        combined[k] = combined_vals
+    #if identical key, add new val to list
+    KeyValListOps = {
+      :add => lambda do |h|
+        combined_keys = (h.keys + self.keys).uniq
+        combined = {}
+        combined_keys.each do |k|
+          combined_vals = ([*self[k]] + [*h[k]]).uniq
+          combined_vals.compact!
+          combined[k] = combined_vals
+        end
+        combined
+      end,
+      :subtract => lambda do |h|
+        difference = {}
+        self.keys.each do |k|
+          diff_vals = [*self[k]] - [*h[k]]
+          diff_vals.uniq!
+          diff_vals.compact!
+          difference[k] = diff_vals
+        end
+        difference
+      end,
+      #replace and convert vals to arrays
+      :replace => lambda{|h| h.inject({}){|memo,(k,v)| memo[k] = [*v]; memo} }
+    }
+
+    KeyValNestedOps = {
+      :add => lambda do |other_hash|
+        recurs_lambda = lambda do |h1, h2, memo, last_key|
+          memo ||= {}
+          h1_keys = h1.respond_to?(:keys) ? h1.keys : []
+          h2_keys = h2.respond_to?(:keys) ? h2.keys : []
+          all_keys = h1_keys + h2_keys
+          all_keys.uniq!
+          all_keys.each do |key|
+            if h1[key] == h2[key]
+              memo[key] = [ h1[key] ]
+            else
+              both_keys_exist = h1[key] && h2[key]
+              both_keys_have_keys = h1[key].respond_to?(:keys) && h2[key].respond_to?(:keys)
+              if both_keys_exist && both_keys_have_keys
+                memo[key] = recurs_lambda.call(h1[key], h2[key], memo[key])
+              else 
+                memo[key] = [ h1[key], h2[key] ]
+              end
+            end
+          end
+          memo
+        end
+        result = nil
+        self.tap do |this| 
+          result = recurs_lambda.call(this, other_hash, nil)
+        end
+        result
+      end,
+   
+      :subtract => lambda do |other_hash|
+        recurs_lambda = lambda do |h1, h2, memo, last_key|
+          memo ||= {}
+          h1_keys = h1.respond_to?(:keys) ? h1.keys : []
+          h1_keys.each do |key|
+            if h1[key] == h2[key]
+              memo[key] = begin
+                h1[key] - h2[key] 
+              rescue
+                nil #h1[key]
+              end
+            else
+              both_keys_exist = h1[key] && h2[key]
+              both_keys_have_keys = h1[key].respond_to?(:keys) && h2[key].respond_to?(:keys)
+              if both_keys_exist && both_keys_have_keys
+                memo[key] = recurs_lambda.call(h1[key], h2[key], memo[key])
+              elsif both_keys_exist  #means both don't have keys
+                memo[key] = begin
+                  h1[key] - h2[key] 
+                rescue
+                  h1[key]
+                end
+              elsif !(both_keys_exist) #one or both keys is nil
+                memo[key] = h1[key]
+              end
+            end
+          end
+          memo
+        end
+
+        result = nil
+        self.tap do |this| 
+          result = recurs_lambda.call(this, other_hash, nil)
+        end
+        result
+      end,
+
+      :replace => lambda do |other_hash|
+        recurs_lambda = lambda do |h1, h2, memo, last_key|
+          memo ||= {}
+          h1_keys = h1.respond_to?(:keys) ? h1.keys : []
+          h2_keys = h2.respond_to?(:keys) ? h2.keys : []
+          all_keys = h1_keys + h2_keys
+          all_keys.uniq!
+          all_keys.each do |key|
+            if h1[key] == h2[key]
+              memo[key] = h2[key]
+            else
+              both_keys_exist = h1[key] && h2[key]
+              both_keys_have_keys = h1[key].respond_to?(:keys) && h2[key].respond_to?(:keys)
+              if both_keys_exist && both_keys_have_keys
+                memo[key] = recurs_lambda.call(h1[key], h2[key], memo[key])
+              elsif both_keys_exist  #means both don't have keys
+                memo[key] = h2[key]
+              elsif !(both_keys_exist) #one or both keys is nil
+                memo[key] = h2[key]
+              end
+            end
+          end
+          memo
+        end
+        result = nil
+        self.tap do |this| 
+          result = recurs_lambda.call(this, other_hash)
+        end
+        result
       end
-      combined
-    end,
-    :subtract => lambda do |h|
-      difference = {}
-      self.keys.each do |k|
-        diff_vals = [*self[k]] - [*h[k]]
-        diff_vals.uniq!
-        diff_vals.compact!
-        difference[k] = diff_vals
-      end
-      difference
-    end,
-    #replace and convert vals to arrays
-    :replace => lambda{|h| h.inject({}){|memo,(k,v)| memo[k] = [*v]; memo} }
-  }
-  BindList = {
-    :id => StaticOps,
-    :label => ReplaceOps,
-    :tags => ListOps,
-    :id_lookup => KeyValReplaceOps,
-    :group_lists => KeyValListOps
-  }
+
+    }
+
+    BindList = {
+      :id => StaticOps,
+      :label => ReplaceOps,
+      :tags => ListOps,
+      :id_lookup => KeyValReplaceOps,
+      :group_lists => KeyValListOps,
+      :nested_data => KeyValNestedOps
+    }
+  end
 end
 
-NodeElementOperations = Midas::Factory.make(DefaultOps::BindList)
 
+NodeElementOperations = Midas::Factory.make(key_method_map = NodeElementOperationsData::DefaultOps::BindList)
 
 =begin
-module DefaultOpSets
-  
-  class << self; attr_accessor :op_sets_to_def_table  end
-  #Static Operations are for fixed values (i.e., any attempts at changes are ignored)
-  StaticAddOpDef = lambda{ self }
-  StaticSubtractOpDef = lambda{|this, other| Hash[:update_this => this]}
-
-  StaticOpSet = {:add => StaticAddOpDef, :subtract => StaticSubtractOpDef}
-  
-  #We define a field where adding will replace the existing value for that field, and subtracting a matching value will set the value to nil
-  ReplaceAddOpDef = lambda { |this, other|   Hash[:update_this => other]  }
-  ReplaceSubtractOpDef = lambda do |this, other|
-    if (this == other)
-      Hash[:update_this => nil] 
-    else
-      Hash[:update_this => this]
-    end
-  end
-                                  
-  ReplaceOpSet = {:add => ReplaceAddOpDef, :subtract => ReplaceSubtractOpDef}
-  
-  #We define a field where adding will add the value to the existing list, and subtracting will remove matching values from the list
-  ListAddOpDef = lambda  do |this,other|
-    this = [this].flatten
-    other = [other].flatten
-    this = this + other
-    this.uniq!; this.compact!
-    Hash[:update_this => this]
-  end
-                         
-  ListSubtractOpDef = lambda do |this,other| 
-    this = [this].flatten
-    other = [other].flatten
-    this -= other
-    this.uniq!
-    this.compact!
-    Hash[:update_this => this]
-  end
-  
-  ListOpSet = {:add => ListAddOpDef, :subtract => ListSubtractOpDef}
-  
-  #A bit more complicated is if we have a field that holds key-value pairs, but we want our operations
-  #to operate on the underlying values of the key-value pair, and not on the actual key value sets.
-  #Here the values are a list type.  What happens is if an existing key is passed, the value is added to the 
-  #set of values for the existing key.  If a new key is passed, the new key and its value are added to the list
-  KListAddOpDef = lambda do |this, other|
-    this = this || {}  
-    other = other || {}
-    all_keys = this.keys + other.keys
-    combined = {}
-    all_keys.each do |k|
-      this_list = [this[k]].flatten
-      other_list = [other[k]].flatten
-      combined[k] = (this_list + other_list).flatten
-      #if this[k]
-      #  this[k] = [this[k] ].flatten + [ other[k] ].flatten
-      #else
-      #  this[k] = [ other[k] ].flatten
-      #end 
-      combined[k].uniq!
-      combined[k].compact!
-    end
-    Hash[:update_this => combined] 
-  end
-                                                  
-  KListSubtractOpDef = lambda do |this, other|
-    this = this || {}
-    other = other || {}
-    subtracted_list = {}
-    this.keys.each do |k|
-      this_list = [this[k]].flatten
-      other_list = [other[k]].flatten
-      #other[s].each {|olnk| this[k].delete(olnk) if this[k]}
-      #this[k].delete(other[k]) if this[k]
-      subtracted_list[k] = (this_list - other_list).flatten
-      subtracted_list[k].compact!
-      subtracted_list[k].uniq!
-      #this.delete(k) if (this[k].nil? || this[k].empty?)
-    end
-    Hash[:update_this => subtracted_list]
-  end
-  
-  # With the KVP, we might want the keys that contain a given value
-  #note that in this case, the return value is not the same as the value stored in the field, hence the explicit return_value parameter
-  #Something to think about is whether this should be some type of recursive operation since the record is key-value, and the field is key-value
-  KListGetKeyforValueOpDef = lambda do |this, values|
-    values = [values].flatten
-    this = this|| {}
-    keys = []
-    this.each do |k,v|
-      values.each do |value|
-        keys << k if v.include? value 
-      end
-    end
-    rtn_val = if keys.size > 0
-      {:return_value => keys, :update_this => this}
-    else
-      {:return_value => nil, :update_this => this}
-    end
-    rtn_val
-  end
-  
-  KListOpSet = {:add => KListAddOpDef, 
-                     :subtract => KListSubtractOpDef,
-                     :getkeys => KListGetKeyforValueOpDef} 
-                     
-
-  self.op_sets_to_def_table = { :static_ops => StaticOpSet,
-                        :replace_ops => ReplaceOpSet,
-                        :list_ops => ListOpSet,
-                        :key_list_ops => KListOpSet
-                      }
-
-  #default_config = {:id => StaticFieldOps, :label => ReplaceFieldOps, :tags => ListFieldOps, :kvps=> KVListOps}
-  
-  #default_config = {:id => StaticFieldOps}
-  #self.configuration = default_config
-
-  #the keys represent the data type, the values represent the operations to perform on those datatypes  
-  #Ops = {:id => StaticFieldOps, :label => ReplaceFieldOps, :tags => ListFieldOps, :kvps=> KVListOps}
-  #Ops = NodeElementOperations.configuration
-  
-  #attr_accessor :ops
-  #def self.ops
-  #  NodeElementOperations.configuration
-  #end
-    
-end
-
-module DataModelViews
-
-  OpIdToViewType = {
-      :static_ops => :value_match,
-      :replace_ops => :value_match,
-      :list_ops => :included_match,
-      :key_list_ops => :key_of_included_match
-  }
-  #note: currently "get" is defined as part of the node, and returns the unique record for a given key
-  #keep there or move here?
-  
-  #views return a list of matches (which may be empty)
-  
-  def default_views(field_op_set)
-    views = {}
-    field_op_set.each do |field, op_id|
-      view_name = "by_#{field.to_s}"
-      type_of_view = OpIdToViewType[op_id] || :value_match
-      views[view_name] = {:field => field.to_sym, :type_of_view => type_of_view}
-    end
-    views
-  end
-end
-
+#Tinkit Backward compatibility
 class NodeElementOperations
-  include DataModelViews
-  #Set Logger
-  @@log = TinkitLog.set(self.name, :warn) 
-  
-  DefaultFieldOpSet = {:id => :static_ops,
-                                :data => :replace_ops,
-                                :name => :replace_ops,   #convenience field for a node name
-                                :tags => :list_ops}         #convenience field for a list of tags
-                                #:kvlist => :key_list_ops}   #convenience field for a list of lists
-  
-  #Default works for node element operations, but not glue operations  
-  DefaultKeyFields = { :required_keys => [:id], :primary_key => :id}
-    
-  attr_accessor :field_op_defs, 
-                     :field_op_set_sym,  #used in model for views
-                     :required_instance_keys ,
-                     :required_save_keys,
-                     :node_key,
-                     :key_fields,
-                     :views
-  
-  #With no parameters - Defaults are used
-  #:op_sets_mod => The module with the data operations that apply to the data fields
-  #:field_op_set => The assignment of data fields to the data operations
-  def initialize(op_data = {})
-    @@log.debug {"Node Element Initialized with: #{op_data.inspect}"} if @@log.debug?
-    
-    #set the module with the operation definition and include them
-    @ops_set_module = op_data[:op_sets_mod] ||DefaultOpSets
-    self.class.__send__(:include, @ops_set_module)  #why is this private? am I doing something wrong?
-    
-    #set the mapping between fields and the type of operations supported by those fields
-    @field_op_set_sym = DefaultFieldOpSet.merge(op_data[:field_op_set] || {})
-    @@log.info {"Field Operations Set: #{@field_op_set_sym.inspect}"} if @@log.info?
-    @field_op_defs = get_field_op_procs(@field_op_set_sym)
-    
-    #set the key fields that will work as node/record identifiers or other key fields
-    @key_fields = op_data[:key_fields]||DefaultKeyFields
-    raise "key_fields are required" unless @key_fields
-
-    #we are no longer differentiating between keys required for insantiation and persistence
-    #this can be added in the future easily though.
-    @required_instance_keys = @key_fields[:required_keys]
-    @required_save_keys = @key_fields[:required_keys]
-    @node_key = @key_fields[:primary_key]
-    @views = default_views(@field_op_set_sym)  #TODO: Allow custom views in the future
-  end
-  
-  def set_op(ops)
-    ops.each do |field, ops_sym|
-      op_proc = self.lookup_op_proc(ops_sym)
-      ops[field] = op_proc
+  include NodeElementOperationsData
+  #Create methods of the form #<key>_<operation>
+  #e.g., id_add  #will perform StaticOps Add function on value of :id key
+  DefaultOps::BindList.each do |key, op_type|
+    DefaultOps::OpsList.each do |op_meth|
+      meth_name = "#{key}_#{op_meth}".to_sym
+      block = op_type[op_meth]
+      p block
+      #TODO  Figure out how to set this up, requires looking at how it is used
+      define_method( meth_name, self.__send__(key).__send__(op_meth) )
     end
-    @field_op_defs = @field_op_defs.merge(ops)
   end
-  
-  def lookup_op_proc(ops_sym)
-     proc = @ops_set_module.op_sets_to_def_table[ops_sym]
-  end
-  
-  def get_field_op_procs(field_op_set_sym)
-    field_op_defs = {}
-    #convert from symbol to actual Proc.  Using symbol allows the type of op to be passed around
-    #needed because the Proc is anonymous so self-referential data is hard to get
-    @field_op_set_sym.each do |field, ops_sym|
-      if ops_sym.class == Symbol
-        ops_proc = lookup_op_proc(ops_sym)
-        field_op_defs[field] = ops_proc
-      else
-        raise "Unrecognized operation definition label #{ops_orig.inspect}"
-      end 
-    end
-    field_op_defs
-  end
-  
 end
 =end
