@@ -3,7 +3,7 @@
 
 #module <PersistentLayer>Interface
   #persistent layer helper classes/modules can go here
-   
+  
   class FilesMgrBase
     #persistent layer class initialization code
     #persistent layer accessors

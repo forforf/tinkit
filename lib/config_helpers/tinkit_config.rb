@@ -1,5 +1,7 @@
 require 'uri'
 require 'couchrest'
+require 'mysql'
+require 'dbi'
 require 'json'
 require 'fileutils'
 
@@ -20,6 +22,10 @@ module TinkitConfig
     'file' => {
       :method => :activate_file,
       :args => ['host']
+    },
+    'mysql' => {
+      :method => :activate_mysql,
+      :args => ['host', 'user']
     }
   }
 
@@ -52,13 +58,14 @@ module TinkitConfig
     end
 
     def get_permissions
-      raise "Invalid Permission data" if permissions > 15
+      perm_val = permissions
+      raise "Invalid Permission data" if perm_val > 15
       result = []
-      result << :read if permissions >= 8
-      result << :write if permissions >=4
-      result << :reach if permissions >= 2
-      result << :exists if permissions >= 1 
-      result << :none if permissions == 0
+      result << :read if  (perm_val/8) % 2 == 1
+      result << :write if (perm_val/4) % 2 == 1
+      result << :reach if (perm_val/2) % 2 == 1
+      result << :exists if perm_val    % 2 == 1 
+      result << :none if   perm_val == 0
       result
     end
   end
@@ -133,15 +140,49 @@ module TinkitConfig
     #check if store exists
     resp_ex = JSON.parse(`curl -sX GET #{url.to_s}`)
     store_caps = StoreAccess.new
-    store_caps.add_permissions([:exist, :reach, :read]) if resp_ex["db_name"] == db_name
+    store_caps.add_permissions([:exists, :reach, :read]) if resp_ex["db_name"] == db_name
     dummy_data = {:dummy => "Dummy"}.to_json
-    #p url.to_s
     #check if store can be written to (and read)
     resp_rw = JSON.parse(`curl -sX POST #{url.to_s} -H 'Content-Type:application/json' -d \'#{dummy_data}\'`)
     store_caps.add_permissions([:write]) if resp_rw["id"]
     #resp = Resp.new('couchdb', native_resp_json)
     #resp.store = store
     #return store_caps
+    Store.new(store, store_caps)
+  end
+
+  #Change database to generic test database, rather than spec database
+  def self.activate_mysql(args)
+    mysql_db_name = args[:store_name]
+    host = args[:host]
+    userinfo = args[:user]
+    user, pw = userinfo.split ":"
+    dbi_host = "DBI:Mysql:#{mysql_db_name}:#{host}"
+    store_caps = StoreAccess.new
+    store = nil
+    begin
+      store = DBI.connect dbi_host, user, pw
+      row = store.select_one("SELECT VERSION()")
+      store_caps.add_permissions([:exists, :reach, :read]) if row[0].to_f > 5.0
+      store.do "DROP TABLE IF EXISTS dummy"
+      store.do "CREATE TABLE dummy (
+                  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                  test_data CHAR(20) NOT NULL,
+                  PRIMARY KEY (id))"
+      rows = store.do "INSERT INTO dummy(test_data)
+                         VALUES
+                           ('Test1'), ('Test2')"
+      store_caps.add_permissions([:write]) if rows > 1
+      store.do "DROP TABLE IF EXISTS dummy"
+    
+      #puts "Server version: " + row[0]
+    rescue DBI::DatabaseError => e
+      store_caps.reset
+      #p e.exception
+      #p e.message 
+    ensure
+      store.disconnect if store
+    end
     Store.new(store, store_caps)
   end
 
@@ -161,6 +202,7 @@ module TinkitConfig
     #return store_caps
     Store.new(file_store_path, store_caps)
   end
+
 
   def self.activate_stores(store_names, tinkit_store_name)
     raise "Configuration file location not set. Use:  #{self.name}.set_config_file_location(\"path/to/config/file\")" unless @@config_file_location

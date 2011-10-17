@@ -4,10 +4,11 @@ require_relative '../lib/helpers/require_helper'
 require Tinkit.glue 'filesystem/filesystem_files_mgr'
 require Tinkit.config 'tinkit_config'
 
-include FilesystemInterface
+#include FilesystemInterface
 GlueEnvMock = Struct.new(:model_key, :user_datastore_location)
 
-describe FilesMgr, "Setup and intialization" do
+describe FilesystemInterface::FilesMgr, "Setup and intialization" do
+  include FilesystemInterface
 
   before(:all) do
     TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
@@ -46,7 +47,9 @@ describe FilesMgr, "Setup and intialization" do
   end
 end
   
-describe FilesMgr, "Basic Operations" do
+describe FilesystemInterface::FilesMgr, "Basic Operations" do
+include FilesystemInterface
+
   before(:all) do
     TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
     @stores = TinkitConfig.activate_stores(['tmp_files'], 'tinkit_spec_dummy')

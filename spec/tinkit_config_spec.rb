@@ -19,6 +19,11 @@ module TinkitConfigSpec
           'type' => 'file',
           'host' => '/foo/delete_me',
           'user' => nil
+        },
+        'dev_mysql' => {
+          'type' => 'mysql',
+          'host' => 'foo.somewhere.com',
+          'user' => 'nobody:nobody'
         }
       }
     }
@@ -107,7 +112,7 @@ describe "Activating CouchDb Stores", TinkitConfig do
   end
 
   it "should provide informative response if db doesnt exist" do
-    stores = TinkitConfig.activate_stores(['iris'], 'some_db_name')
+    stores = TinkitConfig.activate_stores(['iris'], 'invalid_db_name')
     stores.size.should == 1
     stores['iris'].access.get_permissions.should == [:none]
   end
@@ -142,8 +147,8 @@ describe "Activating File Stores", TinkitConfig do
     TinkitConfig.set_config_file_location(@tmp_file)
   end
 
-  it "should provide informative response if file cant be createdd" do
-    stores = TinkitConfig.activate_stores(['tmp_files'], 'some_file_name')
+  it "should provide informative response if file cant be created" do
+    stores = TinkitConfig.activate_stores(['tmp_files'], 'invalid_file_name')
     stores.size.should == 1
     stores['tmp_files'].access.get_permissions.should == [:none]
   end
@@ -161,4 +166,38 @@ describe "Activating File Stores", TinkitConfig do
     stores = TinkitConfig.activate_stores( ['tmp_files'], 'tinkit_spec_dummy')
     stores['tmp_files'].loc.should == "/tmp/tinkit_test_data/tinkit_spec_dummy"
   end
+end
+
+describe "Acitvating Mysql Stores", TinkitConfig do
+  include TinkitConfigSpec
+  before :each do
+    @tmp_file = "/tmp/sens_data"
+    @data = invalid_store_data
+    yaml = Psych.dump @data
+    File.open(@tmp_file,'w+'){|f| f.write(yaml)}
+    TinkitConfig.set_config_file_location(@tmp_file)
+  end
+
+  it "should provide informative response if mysql db cant be created" do
+    stores = TinkitConfig.activate_stores(['dev_mysql'], 'invalid_db_name')
+    stores.size.should == 1
+    stores['dev_mysql'].access.get_permissions.should == [:none]
+  end
+
+  it "should activate mysql store" do
+    TinkitConfig.set_config_file_location SensDataLocation
+    stores = TinkitConfig.activate_stores( ['dev_mysql'], 'tinkit_spec_dummy')
+    [:read, :write, :exists, :reach].each do |perm|
+        stores['dev_mysql'].access.get_permissions
+      stores['dev_mysql'].access.get_permissions.should include perm
+    end
+  end
+
+  it "should return a reference location to the store" do
+    TinkitConfig.set_config_file_location SensDataLocation
+    stores = TinkitConfig.activate_stores( ['dev_mysql'], 'tinkit_spec_dummy')
+    stores['dev_mysql'].loc.class.should == DBI::DatabaseHandle
+    stores['dev_mysql'].loc.driver_name.should == "Mysql"
+  end
+
 end
