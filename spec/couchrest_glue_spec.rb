@@ -8,8 +8,8 @@ TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
 
 
 
-TinkitResps =  TinkitConfig.activate_stores( ['iris'], 'tinkit_spec_glue_env')
-GlueTestDb = TinkitResps['iris'].store
+TinkitStores =  TinkitConfig.activate_stores( ['iris'], 'tinkit_spec_glue_env')
+GlueTestDb = TinkitStores['iris'].loc
 
 
 #GlueTestDb = CouchRest.database!("http://127.0.0.1:5984/couchrest_glue_test")

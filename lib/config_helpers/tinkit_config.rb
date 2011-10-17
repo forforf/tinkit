@@ -23,7 +23,7 @@ module TinkitConfig
     }
   }
 
-  class StoreCapabilities
+  class StoreAccess
     #Admin = 8
     Read, Write, Reachable, Exists = 8,4,2,1
     attr_reader :reach, :read, :write, :exists
@@ -60,6 +60,14 @@ module TinkitConfig
       result << :exists if permissions >= 1 
       result << :none if permissions == 0
       result
+    end
+  end
+
+  class Store
+    attr_reader :access, :loc
+    def initialize(loc, access)
+      @loc = loc
+      @access =  access
     end
   end
 
@@ -124,7 +132,7 @@ module TinkitConfig
     store = CouchRest.database! url.to_s
     #check if store exists
     resp_ex = JSON.parse(`curl -sX GET #{url.to_s}`)
-    store_caps = StoreCapabilities.new
+    store_caps = StoreAccess.new
     store_caps.add_permissions([:exist, :reach, :read]) if resp_ex["db_name"] == db_name
     dummy_data = {:dummy => "Dummy"}.to_json
     #p url.to_s
@@ -133,13 +141,14 @@ module TinkitConfig
     store_caps.add_permissions([:write]) if resp_rw["id"]
     #resp = Resp.new('couchdb', native_resp_json)
     #resp.store = store
-    return store_caps
+    #return store_caps
+    Store.new(store, store_caps)
   end
 
   def self.activate_file(args)
     file_store_name = args[:store_name]
     file_store_dir = args[:host]
-    store_caps = StoreCapabilities.new
+    store_caps = StoreAccess.new
     file_store_path = File.join(file_store_dir, file_store_name)
     begin
       native_resp = FileUtils.mkdir_p(file_store_path)
@@ -149,16 +158,17 @@ module TinkitConfig
     end
     store_caps.add_permissions([:write]) if File.writable?(file_store_path)
     store_caps.add_permissions([:read]) if File.readable?(file_store_path)
-    return store_caps
+    #return store_caps
+    Store.new(file_store_path, store_caps)
   end
 
   def self.activate_stores(store_names, tinkit_store_name)
     raise "Configuration file location not set. Use:  #{self.name}.set_config_file_location(\"path/to/config/file\")" unless @@config_file_location
-    capability_resps = {}
+    store_info = {}
     store_names.each do |store_name|
-      capability_resps[store_name] =  self.activation(store_name, tinkit_store_name)
+      store_info[store_name] =  self.activation(store_name, tinkit_store_name)
     end
-    capability_resps
+    store_info
   end
 end
 

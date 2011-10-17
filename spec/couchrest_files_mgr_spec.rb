@@ -11,8 +11,8 @@ require Tinkit.glue 'couchrest/couchrest_files_mgr'
 
 include CouchrestInterface
 
-TinkitResps =  TinkitConfig.activate_stores( ['iris'], 'tinkit_spec_filemgr')
-FileMgrTestDb = TinkitResps['iris'].store
+TinkitStores =  TinkitConfig.activate_stores( ['iris'], 'tinkit_spec_filemgr')
+FileMgrTestDb = TinkitStores['iris'].loc
 
 #FileMgrTestDb = CouchRest.database!("http://127.0.0.1:5984/couchrest_file_mgr_test")
 FileMgrTestDb.compact!

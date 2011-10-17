@@ -1,6 +1,8 @@
 #require helper for cleaner require statements
-require File.join(File.expand_path(File.dirname(__FILE__)), '../lib/helpers/require_helper')
+require_relative '../lib/helpers/require_helper'
+
 require Tinkit.glue 'filesystem/filesystem_files_mgr'
+require Tinkit.config 'tinkit_config'
 
 include FilesystemInterface
 GlueEnvMock = Struct.new(:model_key, :user_datastore_location)
@@ -8,7 +10,9 @@ GlueEnvMock = Struct.new(:model_key, :user_datastore_location)
 describe FilesMgr, "Setup and intialization" do
 
   before(:all) do
-    
+    TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+    @stores = TinkitConfig.activate_stores(['tmp_files'], 'tinkit_spec_dummy')
+    @store_loc = @stores['tmp_files'].loc 
     @glue_env_mock = GlueEnvMock.new("_id", "/tmp/datastore_location")
     @node_key = :_id
     
@@ -23,7 +27,16 @@ describe FilesMgr, "Setup and intialization" do
     @file_datas = [{:src_filename => file1_fname}, {:src_filename => file2_fname}]
     @node1_data = {:_id => 'spec_test1', :data => 'stuff1'}
   end
-  
+ 
+
+  it "should have a working file data storage" do
+    store = @stores['tmp_files']
+    required_permissions = [:read, :write]
+    required_permissions.each do |perm|
+      store.access.get_permissions.should include perm
+    end
+  end 
+
   it "should initialize" do
     node_key_value = @node1_data[@node_key]
     attach_handler = FilesMgr.new(@glue_env_mock, node_key_value)
@@ -35,7 +48,11 @@ end
   
 describe FilesMgr, "Basic Operations" do
   before(:all) do
-    @user_datastore_location = "/tmp/datastore_location"
+    TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+    @stores = TinkitConfig.activate_stores(['tmp_files'], 'tinkit_spec_dummy')
+    @store_loc = @stores['tmp_files'].loc
+
+    @user_datastore_location = @store_loc 
     @file1_fname = "/tmp/example_file1.txt"
     @file2_fname = "/tmp/example_file2.txt"
     f1_bname = File.basename(@file1_fname)

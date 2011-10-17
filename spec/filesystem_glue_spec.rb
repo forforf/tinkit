@@ -1,15 +1,27 @@
 #require helper for cleaner require statements
-require File.join(File.expand_path(File.dirname(__FILE__)), '../lib/helpers/require_helper')
+require_relative '../lib/helpers/require_helper'
 
 require Tinkit.glue 'filesystem_glue_env'
+require Tinkit.config 'tinkit_config'
 
-FilesystemGlueSpecDir = File.expand_path('../sandbox_for_specs/file_system_specs/glue_spec')
+
+    #TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+    #@stores = TinkitConfig.activate_stores(['tmp_files'], 'tinkit_spec_dummy')
+    #@store_loc = @stores['tmp_files'].loc
+
+#FilesystemGlueSpecDir = File.expand_path('../sandbox_for_specs/file_system_specs/glue_spec')
 
 describe FilesystemEnv::GlueEnv, "Initialization" do
+  before(:all) do
+    TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+  end
+
   before(:each) do
+    @stores = TinkitConfig.activate_stores(['tmp_files'], 'tinkit_spec_dummy')
+    @store_loc = @stores['tmp_files'].loc
     #set up env
     persist_env = { :host => nil,
-                          :path => FilesystemGlueSpecDir,
+                          :path => @store_loc, #FilesystemGlueSpecDir,
                           :user_id => 'fs_glue_user'}
     
     @persist_env = {:name => :filesystem_glue_test, :env => persist_env}
@@ -29,9 +41,6 @@ describe FilesystemEnv::GlueEnv, "Initialization" do
   
   it "should initialize properly" do
     filesystem_glue_obj = FilesystemEnv::GlueEnv.new(@persist_env, @data_model_bindings)
-    #@data_dir = filesystem_glue_obj.user_datastore_location
-    
-    #filesystem_glue_obj.dbh.connected?.should == true
     
     filesystem_glue_obj.user_id.should == @persist_env[:env][:user_id]
     filesystem_glue_obj.required_instance_keys.should == @data_model_bindings[:key_fields][:required_keys]
@@ -50,11 +59,17 @@ describe FilesystemEnv::GlueEnv, "Initialization" do
 end
 
 describe FilesystemEnv::GlueEnv, "Persistent Layer Basic Operations" do
-  
+  before(:all) do
+    TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+  end
+
   before(:each) do
+    @stores = TinkitConfig.activate_stores(['tmp_files'], 'tinkit_spec_dummy')
+    @store_loc = @stores['tmp_files'].loc
+  
     #set up env
     persist_env = { :host => nil,
-                          :path => FilesystemGlueSpecDir,
+                          :path => @store_loc, #FilesystemGlueSpecDir,
                           :user_id => 'fs_glue_user'}
     
     #name isn't used in these specs, since that's used by the node factory to select the glue env
@@ -71,7 +86,11 @@ describe FilesystemEnv::GlueEnv, "Persistent Layer Basic Operations" do
   end
   
   after(:all) do
-    fs_dir = File.dirname(@persist_env[:env][:path])
+    @stores = TinkitConfig.activate_stores(['tmp_files'], 'tinkit_spec_dummy')
+    @store_loc = @stores['tmp_files'].loc
+
+    #fs_dir = File.dirname(@ersist_env[:env][:path])
+    fs_dir = File.dirname(@store_loc)
     FileUtils.rm_rf(fs_dir) if fs_dir
   end
   
@@ -107,11 +126,17 @@ describe FilesystemEnv::GlueEnv, "Persistent Layer Basic Operations" do
 end
 
 describe FilesystemEnv::GlueEnv, "Persistent Layer Collection Operations" do
+  before(:all) do
+    TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+  end
 
   before(:each) do
+    @stores = TinkitConfig.activate_stores(['tmp_files'], 'tinkit_spec_dummy')
+    @store_loc = @stores['tmp_files'].loc
+
     #set up env
     persist_env = { :host => nil,
-                          :path => FilesystemGlueSpecDir,
+                          :path => @store_loc, #FilesystemGlueSpecDir,
                           :user_id => 'fs_glue_user'}
     
     #name isn't used in these specs, since that's used by the node factory to select the glue env

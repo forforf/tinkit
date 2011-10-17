@@ -25,14 +25,14 @@ module TinkitConfigSpec
   end
 end
 
-describe "TinkitConfig::StoreCapabilities" do
+describe "TinkitConfig::StoreAccess" do
   before :each do
-    @cap = TinkitConfig::StoreCapabilities.new
+    @cap = TinkitConfig::StoreAccess.new
   end
 
   it "should initialize properly" do
-    Caps = TinkitConfig::StoreCapabilities
-    Caps.new.is_a?(TinkitConfig::StoreCapabilities).should == true
+    Caps = TinkitConfig::StoreAccess
+    Caps.new.is_a?(TinkitConfig::StoreAccess).should == true
     Caps.new.permissions.should == 0
     Caps.new(:exists => true).permissions.should == 1
     Caps.new(:reach => true).permissions.should == 2
@@ -107,19 +107,27 @@ describe "Activating CouchDb Stores", TinkitConfig do
   end
 
   it "should provide informative response if db doesnt exist" do
-    resps = TinkitConfig.activate_stores(['iris'], 'some_db_name')
-    resps.size.should == 1
-    resps['iris'].get_permissions.should == [:none]
+    stores = TinkitConfig.activate_stores(['iris'], 'some_db_name')
+    stores.size.should == 1
+    stores['iris'].access.get_permissions.should == [:none]
   end
 
   it "should activate couchdb store" do
     TinkitConfig.set_config_file_location SensDataLocation
-    store_capabilities = TinkitConfig.activate_stores( ['iris'], 'tinkit_spec_dummy')
-    store_capabilities.size.should == 1
+    stores = TinkitConfig.activate_stores( ['iris'], 'tinkit_spec_dummy')
+    stores.size.should == 1
     [:read, :write, :exists, :reach].each do |perm|
-      store_capabilities['iris'].get_permissions.should include perm
+      stores['iris'].access.get_permissions.should include perm
     end
   end
+
+  it "should return a reference location to the store" do
+    TinkitConfig.set_config_file_location SensDataLocation
+    stores = TinkitConfig.activate_stores( ['iris'], 'tinkit_spec_dummy')
+    stores['iris'].loc.class.should == CouchRest::Database
+    stores['iris'].loc.to_s.should == "http://forforf.iriscouch.com:5984/tinkit_spec_dummy"
+  end
+
 
 end
 
@@ -135,16 +143,22 @@ describe "Activating File Stores", TinkitConfig do
   end
 
   it "should provide informative response if file cant be createdd" do
-    store_capabilities = TinkitConfig.activate_stores(['tmp_files'], 'some_file_name')
-    store_capabilities.size.should == 1
-    store_capabilities['tmp_files'].get_permissions.should == [:none]
+    stores = TinkitConfig.activate_stores(['tmp_files'], 'some_file_name')
+    stores.size.should == 1
+    stores['tmp_files'].access.get_permissions.should == [:none]
   end
 
   it "should activate file store" do
     TinkitConfig.set_config_file_location SensDataLocation
-    store_capabilities = TinkitConfig.activate_stores( ['tmp_files'], 'tinkit_spec_dummy')
+    stores = TinkitConfig.activate_stores( ['tmp_files'], 'tinkit_spec_dummy')
     [:read, :write, :exists, :reach].each do |perm|
-      store_capabilities['tmp_files'].get_permissions.should include perm
+      stores['tmp_files'].access.get_permissions.should include perm
     end
+  end
+
+  it "should return a reference location to the store" do
+    TinkitConfig.set_config_file_location SensDataLocation
+    stores = TinkitConfig.activate_stores( ['tmp_files'], 'tinkit_spec_dummy')
+    stores['tmp_files'].loc.should == "/tmp/tinkit_test_data/tinkit_spec_dummy"
   end
 end
