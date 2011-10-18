@@ -24,6 +24,11 @@ module TinkitConfigSpec
           'type' => 'mysql',
           'host' => 'foo.somewhere.com',
           'user' => 'nobody:nobody'
+        },
+        'dev_sdb_s3' => {
+          'type' => 'sdb_s3',
+          'host' => nil,
+          'user' => 'foo:bar'
         }
       }
     }
@@ -198,6 +203,41 @@ describe "Acitvating Mysql Stores", TinkitConfig do
     stores = TinkitConfig.activate_stores( ['dev_mysql'], 'tinkit_spec_dummy')
     stores['dev_mysql'].loc.class.should == DBI::DatabaseHandle
     stores['dev_mysql'].loc.driver_name.should == "Mysql"
+  end
+
+end
+
+#TODO: Include S3
+describe "Acitvating SDB S3 Stores", TinkitConfig do
+  include TinkitConfigSpec
+  before :each do
+    @tmp_file = "/tmp/sens_data"
+    @data = invalid_store_data
+    yaml = Psych.dump @data
+    File.open(@tmp_file,'w+'){|f| f.write(yaml)}
+    TinkitConfig.set_config_file_location(@tmp_file)
+  end
+
+  it "should provide informative response if mysql db cant be created" do
+    stores = TinkitConfig.activate_stores(['dev_sdb_s3'], 'invalid_db_name')
+    stores.size.should == 1
+    stores['dev_sdb_s3'].access.get_permissions.should == [:none]
+  end
+
+  it "should activate sdb store" do
+    TinkitConfig.set_config_file_location SensDataLocation
+    stores = TinkitConfig.activate_stores( ['dev_sdb_s3'], 'tinkit_spec_dummy')
+    [:read, :write, :exists, :reach].each do |perm|
+        stores['dev_sdb_s3'].access.get_permissions
+      stores['dev_sdb_s3'].access.get_permissions.should include perm
+    end
+  end
+
+  it "should return a reference location to the store" do
+    TinkitConfig.set_config_file_location SensDataLocation
+    stores = TinkitConfig.activate_stores( ['dev_sdb_s3'], 'tinkit_spec_dummy')
+    stores['dev_sdb_s3'].loc.class.should == AwsSdb::Service
+    stores['dev_sdb_s3'].loc.list_domains.first.should include 'tinkit_spec_dummy'
   end
 
 end

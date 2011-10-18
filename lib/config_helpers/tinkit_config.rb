@@ -4,6 +4,7 @@ require 'mysql'
 require 'dbi'
 require 'json'
 require 'fileutils'
+require 'aws_sdb'  #published as gem forforf-aws-sdb
 
 require_relative 'sens_data'
 
@@ -26,7 +27,12 @@ module TinkitConfig
     'mysql' => {
       :method => :activate_mysql,
       :args => ['host', 'user']
-    }
+    },
+    'sdb_s3' => {
+      :method => :activate_sdb_s3,
+      :args => ['user']
+    },
+
   }
 
   class StoreAccess
@@ -208,6 +214,38 @@ module TinkitConfig
     Store.new(file_store_path, store_caps)
   end
 
+  def self.activate_sdb_s3(args)
+    db_name = args[:store_name]
+    #host = args[:host]
+    userinfo = args[:user]
+    #db_path = "/" + db_name
+    #host = "forforf.iriscouch.com"
+    #url = URI::HTTP.build :userinfo => userinfo, :host => host, :path => db_path, :port => 5984
+    aws_keys = userinfo.split ":"
+    access_key = aws_keys.first
+    sa_key = aws_keys.last
+    svc_options = {:access_key_id => access_key, :secret_access_key => sa_key}
+    sdb_store = AwsSdb::Service.new(svc_options)
+    #check if store exists
+    store_caps = StoreAccess.new
+    begin
+      #check if store can be written to (and read)
+      sdb_store.create_domain(db_name)
+      store_caps.add_permissions([:exists]) if sdb_store
+      sdb_store.put_attributes(db_name, "dummy_data", {"dummy" =>"Dummy"})
+      #data may not show up right away
+      data = sdb_store.get_attributes(db_name, "dummy_data")
+      store_caps.add_permissions([:read, :reach, :write]) if data["dummy"] == ["Dummy"]
+    rescue NameError
+      #AwsSdb::InvalidClientTokenIdError
+      puts "Rescued: "
+      store_caps.reset
+    end
+    #resp = Resp.new('couchdb', native_resp_json)
+    #resp.store = store
+    #return store_caps
+    Store.new(sdb_store, store_caps)
+  end
 
   def self.activate_stores(store_names, tinkit_store_name)
     raise "Configuration file location not set. Use:  #{self.name}.set_config_file_location(\"path/to/config/file\")" unless @@config_file_location
