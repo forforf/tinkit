@@ -2,6 +2,7 @@
 #require File.join(File.expand_path(File.dirname(__FILE__)), '../lib/helpers/require_helper')
 require_relative '../lib/helpers/require_helper'
 require Tinkit.glue 'mysql/mysql_files_mgr'
+require Tinkit.config 'tinkit_config'
 
 include MysqlInterface
 GlueEnvMock = Struct.new(:model_key, :file_mgr_table)
@@ -9,7 +10,9 @@ GlueEnvMock = Struct.new(:model_key, :file_mgr_table)
 describe FilesMgr, "Setup and intialization" do
 
   before(:all) do
-    
+    TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+    @stores = TinkitConfig.activate_stores(['dev_mysql'], 'tinkit_spec_dummy')
+    @store_loc = @stores['dev_mysql'].loc
     @glue_env_mock = GlueEnvMock.new("_id", "fake_file_table_name")
     @node_key = :_id
     
@@ -25,6 +28,14 @@ describe FilesMgr, "Setup and intialization" do
     @node1_data = {:_id => 'spec_test1', :data => 'stuff1'}
   end
   
+  it "should have a working mysql data storage" do
+    store = @stores['dev_mysql']
+    required_permissions = [:read, :write]
+    required_permissions.each do |perm|
+      store.access.get_permissions.should include perm
+    end
+  end
+
   it "should initialize" do
     
     #we're not creating the table yet, as that depends on the glue and user
@@ -37,7 +48,13 @@ describe FilesMgr, "Setup and intialization" do
 end
   
 describe FilesMgr, "Basic Operations" do
+
   before(:all) do
+    TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+    @stores = TinkitConfig.activate_stores(['dev_mysql'], 'tinkit_spec_dummy')
+    @store = @stores['dev_mysql']
+    @store_loc = @store.loc
+
     @file_table_name = "attachment_spec__node_loc"
     @file1_fname = "/tmp/example_file1.txt"
     @file2_fname = "/tmp/example_file2.txt"
@@ -55,10 +72,14 @@ describe FilesMgr, "Basic Operations" do
     #set up table for spec
     
     primary_key = '__pkid-file'
-    home_dir = ENV["HOME"]  
-    my_pw = File.open("#{home_dir}/.locker/tinkit_mysql"){|f| f.read}.strip
-    @dbh = DBI.connect("DBI:Mysql:tinkit:localhost", "tinkit", my_pw)
-    
+    #home_dir = ENV["HOME"]  
+    #my_pw = File.open("#{home_dir}/.locker/tinkit_mysql"){|f| f.read}.strip
+    #@dbh = DBI.connect("DBI:Mysql:tinkit:localhost", "tinkit", my_pw)
+    if @store_loc.connected?
+      @dbh = @store_loc
+    else
+      @dbh = DBI.connect *@store.mysql_connection
+    end
     sql = "CREATE TABLE IF NOT EXISTS `#{@file_table_name}` (
           `#{primary_key}` INT NOT NULL AUTO_INCREMENT,
           node_name VARCHAR(255),
@@ -87,6 +108,7 @@ describe FilesMgr, "Basic Operations" do
   after(:all) do
     sql = "DROP TABLE `#{@file_table_name}`"
     @dbh.do(sql)
+    @dbh.disconnect
   end
   
   it "should add and retrieve files" do

@@ -3,15 +3,22 @@ require 'json'
 
 require Tinkit.helpers 'mime_types_new'
 require Tinkit.helpers 'tk_escape.rb'
+require Tinkit.config 'tinkit_config'
 
 module MysqlInterface
   class FilesMgr
 
-    class << self; attr_accessor :dbh; end
-    @@home_dir = ENV["HOME"]
-    @@my_pw = File.open("#{@@home_dir}/.locker/tinkit_mysql"){|f| f.read}.strip
+    class << self; attr_accessor :dbh, :tk_mysql_store; end
+    #TODO: is there a better way for connecting to mysql db?
+    #TODO: create db if it doesn't exist?
+    TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+    TinkitStores = TinkitConfig.activate_stores(['dev_mysql'], 'tinkit_spec_dummy')
+    @tk_mysql_store = TinkitStores['dev_mysql']
+    @dbh = @tk_mysql_store.loc
+    #@@home_dir = ENV["HOME"]
+    #@@my_pw = File.open("#{@@home_dir}/.locker/tinkit_mysql"){|f| f.read}.strip
     
-    @dbh = DBI.connect("DBI:Mysql:tinkit:localhost", "tinkit", @@my_pw)
+    #@dbh = DBI.connect("DBI:Mysql:tinkit:localhost", "tinkit", @@my_pw)
 
     #Table Structure
     MySqlPrimaryKey = '__pkid-file'
@@ -30,6 +37,7 @@ module MysqlInterface
     
     def initialize(glue_env, node_key_value)
       @dbh = self.class.dbh
+      @dbh = DBI.connect *self.class.tk_mysql_store.mysql_connection unless @dbh.connected?
       @file_table_name = glue_env.file_mgr_table
     end
 

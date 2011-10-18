@@ -8,11 +8,15 @@ require 'json'
 require 'dbi'
 
 module MysqlEnv
-    class << self; attr_accessor :dbh; end
-    @@home_dir = ENV["HOME"]
-    @@my_pw = File.open("#{@@home_dir}/.locker/tinkit_mysql"){|f| f.read}.strip
+    class << self; attr_accessor :dbh, :tk_mysql_store; end
+    #@@home_dir = ENV["HOME"]
+    #@@my_pw = File.open("#{@@home_dir}/.locker/tinkit_mysql"){|f| f.read}.strip
 
-    self.dbh = DBI.connect("DBI:Mysql:tinkit:localhost", "tinkit", @@my_pw)
+    #self.dbh = DBI.connect("DBI:Mysql:tinkit:localhost", "tinkit", @@my_pw)
+    TinkitConfig.set_config_file_location(Tinkit::DatastoreConfig)
+    TinkitStores = TinkitConfig.activate_stores(['dev_mysql'], 'tinkit_spec_dummy')
+    @tk_mysql_store = TinkitStores['dev_mysql']
+    @dbh = @tk_mysql_store.loc
     
 class GlueEnv
     
@@ -61,6 +65,7 @@ class GlueEnv
     #TODO: Determine if class_name is needed to segment cluster data within user data
     #host = "https://sdb.amazonaws.com/"  (not provided by user)
     @dbh = MysqlEnv.dbh
+    @dbh = DBI.connect *MysqlEnv.tk_mysql_store.mysql_connection unless @dbh.connected?
     #@_file_mgr_table = 'blahblah' #set in file_mgr
     mysql_env = persist_env[:env]
     #TODO: validations on format

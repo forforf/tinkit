@@ -72,6 +72,9 @@ module TinkitConfig
 
   class Store
     attr_reader :access, :loc
+    #TODO: Temporary fix for Mysql
+    attr_accessor :mysql_connection
+
     def initialize(loc, access)
       @loc = loc
       @access =  access
@@ -183,7 +186,9 @@ module TinkitConfig
     ensure
       store.disconnect if store
     end
-    Store.new(store, store_caps)
+    store_obj = Store.new(store, store_caps)
+    store_obj.mysql_connection = [dbi_host, user, pw]
+    store_obj
   end
 
   def self.activate_file(args)
